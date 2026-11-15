@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "unit-test-designer"
+version = "2.0.0"
+description = "Thiết kế Unit Test theo đặc tả độc lập (black-box): phỏng vấn chốt Business Rules, sinh test case theo ngân sách, kiểm toán 9 cổng, xuất Excel + Markdown"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "h004888"}]
+keywords = ["unit-test", "istqb", "black-box", "openspec", "qa"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = ["openpyxl>=3.1"]
+
+[project.optional-dependencies]
+yaml = ["pyyaml>=6"]
+dev = ["pytest>=8"]
+
+[project.scripts]
+utd = "utd.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["utd*"]
+
+[tool.setuptools.package-data]
+utd = [
+    "_data/rules/*.json",
+    "_data/data/*.json",
+    "_data/skill/*.md",
+    "_data/skill/references/*.md",
+    "_data/skill/assets/*.json",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

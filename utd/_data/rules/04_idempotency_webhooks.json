@@ -1,0 +1,200 @@
+{
+  "domain": "04_idempotency_webhooks.json",
+  "rules": [
+    {
+      "id": "H-IDEMP-RETRY-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "Idempotent Network Retry Replay",
+      "target_element": "mutating_endpoint",
+      "trigger_condition": "method == 'POST'",
+      "strictness": "MANDATORY",
+      "question_template": "Khi Client gặp timeout mạng và retry lại đúng request POST này (cùng Idempotency-Key hoặc cùng dữ liệu), hệ thống sẽ phản hồi thế nào?",
+      "recommended_option": "(Recommended) Trả về kết quả của lần tạo trước (200/201 kèm ID cũ), tuyệt đối không tạo bản ghi trùng lặp",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-IDEMP-KEY-MISMATCH-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "Idempotency Key Payload Conflict",
+      "target_element": "mutating_endpoint",
+      "trigger_condition": "method == 'POST'",
+      "strictness": "MANDATORY",
+      "question_template": "Nếu Client gửi cùng một 'Idempotency-Key' nhưng thay đổi dữ liệu trong body (khác số tiền, khác sản phẩm), API xử lý sao?",
+      "recommended_option": "(Recommended) Trả về lỗi 409 CONFLICT hoặc 422 với mã IDEMPOTENCY_KEY_PAYLOAD_MISMATCH",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-IDEMP-PUT-REPEAT-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "PUT Repeatability Semantics",
+      "target_element": "put_endpoint",
+      "trigger_condition": "method == 'PUT'",
+      "strictness": "MANDATORY",
+      "question_template": "Khi gọi lại chính xác request PUT nhiều lần liên tiếp, hệ thống có đảm bảo trạng thái dữ liệu và ETag giữ nguyên ổn định không?",
+      "recommended_option": "(Recommended) Đảm bảo tính lũy kế (idempotent): dữ liệu không đổi, ETag ổn định, trả về 200 OK",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-IDEMP-FIN-MANDATORY-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "Mandatory Idempotency Key in Financials",
+      "target_element": "financial_endpoint",
+      "trigger_condition": "endpoint.path.includes('pay')",
+      "strictness": "MANDATORY",
+      "question_template": "Với giao dịch tiền tệ/thanh toán, Header 'Idempotency-Key' có bắt buộc không? Nếu thiếu header này thì có bị từ chối không?",
+      "recommended_option": "(Recommended) Bắt buộc có Idempotency-Key trên mọi lệnh giao dịch tài chính (thiếu báo 400 MISSING_IDEMPOTENCY_KEY)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-IDEMP-LOCK-CONCURRENT-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "Concurrent Requests with Same Key",
+      "target_element": "mutating_endpoint",
+      "trigger_condition": "method == 'POST'",
+      "strictness": "MANDATORY",
+      "question_template": "Khi 2 request gửi cùng một Idempotency-Key tại cùng một mili-giây (request thứ 2 đến khi request 1 đang xử lý dở), API xử lý thế nào?",
+      "recommended_option": "(Recommended) Request 2 bị chặn với mã lỗi 409 CONFLICT kèm mã REQUEST_CURRENTLY_PROCESSING",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-IDEMP-EXPIRY-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "Idempotency Key TTL Expiration",
+      "target_element": "mutating_endpoint",
+      "trigger_condition": "method == 'POST'",
+      "strictness": "CONDITIONAL",
+      "question_template": "Idempotency-Key có thời hạn lưu trữ (TTL) là bao lâu (ví dụ: 24 giờ)? Sau thời gian này gửi lại key cũ thì xử lý ra sao?",
+      "recommended_option": "(Recommended) Lưu cache 24 giờ; sau 24 giờ key hết hạn và request được coi như giao dịch mới",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-IDEMP-WEBHOOK-REPLAY-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "Webhook Replay Attack Protection",
+      "target_element": "webhook_endpoint",
+      "trigger_condition": "endpoint.path.includes('webhook')",
+      "strictness": "MANDATORY",
+      "question_template": "Với API nhận Webhook từ bên thứ ba (Cổng thanh toán): Khi đối tác retry cùng 1 event nhiều lần, API có đảm bảo chỉ xử lý 1 lần duy nhất không?",
+      "recommended_option": "(Recommended) Lưu Event-ID đã xử lý; nếu nhận event cũ thì trả ngay 200 OK không trừ kho/cộng tiền lần 2",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-IDEMP-WEBHOOK-SIG-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "Webhook HMAC Signature Verification",
+      "target_element": "webhook_endpoint",
+      "trigger_condition": "endpoint.path.includes('webhook')",
+      "strictness": "MANDATORY",
+      "question_template": "API Webhook có xác thực chữ ký số HMAC qua Header (ví dụ: X-Signature) để chống giả mạo request không?",
+      "recommended_option": "(Recommended) Bắt buộc xác thực chữ ký HMAC SHA-256; chữ ký sai trả về HTTP 401 Unauthorized",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-IDEMP-WEBHOOK-TIMESTAMP-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "Webhook Timestamp Tolerance",
+      "target_element": "webhook_endpoint",
+      "trigger_condition": "endpoint.path.includes('webhook')",
+      "strictness": "CONDITIONAL",
+      "question_template": "Webhook có kiểm tra timestamp để chống tấn công replay gói tin cũ (Timestamp tolerance <= 5 phút) không?",
+      "recommended_option": "(Recommended) Từ chối webhook có timestamp quá 5 phút so với đồng hồ hiện tại (400 WEBHOOK_TOO_OLD)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-IDEMP-DELETE-REPEAT-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "DELETE Idempotency Contract",
+      "target_element": "delete_endpoint",
+      "trigger_condition": "method == 'DELETE'",
+      "strictness": "MANDATORY",
+      "question_template": "Khi gọi lệnh DELETE lần thứ 2 vào bản ghi đã xóa, API trả về mã nào?",
+      "recommended_option": "(Recommended) Trả về 204 No Content (idempotent, vì trạng thái mong muốn là không tồn tại đã thỏa mãn)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-IDEMP-PATCH-IDEMP-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "PATCH Non-idempotent Operations",
+      "target_element": "patch_endpoint",
+      "trigger_condition": "method == 'PATCH'",
+      "strictness": "CONDITIONAL",
+      "question_template": "Nếu PATCH thực hiện phép toán cộng dồn (ví dụ: increment balance), API có cơ chế chống cộng dồn nhiều lần khi retry không?",
+      "recommended_option": "(Recommended) Yêu cầu Idempotency-Key cho các thao tác PATCH mang tính lũy kế",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-IDEMP-CACHE-ERROR-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "Caching Error Responses on Key",
+      "target_element": "mutating_endpoint",
+      "trigger_condition": "method == 'POST'",
+      "strictness": "MANDATORY",
+      "question_template": "Nếu lần gọi đầu tiên bị lỗi 400 Bad Request, kết quả lỗi có bị cache theo Idempotency-Key không?",
+      "recommended_option": "(Recommended) Không cache lỗi 4xx/5xx tạm thời; cho phép Client sửa payload và gửi lại cùng key hoặc tạo key mới",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-IDEMP-FINGERPRINT-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "Automatic Request Fingerprinting",
+      "target_element": "mutating_endpoint",
+      "trigger_condition": "method == 'POST'",
+      "strictness": "CONDITIONAL",
+      "question_template": "Nếu Client không gửi Idempotency-Key, hệ thống có tự động hash (SHA256) body + user để chống double-click trong 3 giây không?",
+      "recommended_option": "(Recommended) Tự động khóa debounce 3 giây cho các request cùng hash từ cùng một user",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-IDEMP-HEADER-ECHO-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "Idempotency Header Echoing",
+      "target_element": "mutating_endpoint",
+      "trigger_condition": "method == 'POST'",
+      "strictness": "CONDITIONAL",
+      "question_template": "Response trả về có echo lại header 'Idempotency-Key' và header 'Original-Request-Date' không?",
+      "recommended_option": "(Recommended) Trả về header Idempotency-Key để client đối soát",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-IDEMP-ASYNC-POLL-01",
+      "dimension": "4. Idempotency, Retries & Webhooks",
+      "category": "Asynchronous Job Idempotency (202 Accepted)",
+      "target_element": "async_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Với các tác vụ bất đồng bộ lâu dài: Khi submit lại cùng job, API trả về mã nào?",
+      "recommended_option": "(Recommended) Trả về HTTP 202 Accepted kèm URL theo dõi tiến độ Job cũ",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    }
+  ]
+}

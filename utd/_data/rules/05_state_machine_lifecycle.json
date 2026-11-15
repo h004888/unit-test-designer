@@ -1,0 +1,265 @@
+{
+  "domain": "05_state_machine_lifecycle.json",
+  "rules": [
+    {
+      "id": "H-STATE-EXIST-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Resource Existence Verification",
+      "target_element": "resource_id_endpoint",
+      "trigger_condition": "endpoint.path.includes('{id}')",
+      "strictness": "MANDATORY",
+      "question_template": "Khi resource ID '{resource_name}Id' không tồn tại trong cơ sở dữ liệu, API phản hồi HTTP status và error code nào?",
+      "recommended_option": "(Recommended) Trả về HTTP 404 NOT_FOUND kèm mã lỗi RESOURCE_NOT_FOUND",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-UNIQUE-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Uniqueness Conflict",
+      "target_element": "unique_field_param",
+      "trigger_condition": "has_unique_field == true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi tạo mới bản ghi với trường duy nhất '{field_name}' (email, phone, code) đã tồn tại, API phản hồi mã nào?",
+      "recommended_option": "(Recommended) Trả về HTTP 409 CONFLICT kèm mã lỗi DUPLICATE_ENTRY hoặc ALREADY_EXISTS",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-TRANS-INVALID-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Illegal State Transition",
+      "target_element": "state_machine_endpoint",
+      "trigger_condition": "has_status_field == true",
+      "strictness": "MANDATORY",
+      "question_template": "Nếu thực hiện hành động trên bản ghi đang ở trạng thái không cho phép (Hủy đơn hàng đã 'SHIPPED'), API trả mã nào?",
+      "recommended_option": "(Recommended) Trả về HTTP 409 CONFLICT hoặc 422 với mã lỗi INVALID_STATE_TRANSITION",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-SKIP-BYPASS-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Skip State Bypass Attack",
+      "target_element": "state_machine_endpoint",
+      "trigger_condition": "has_status_field == true",
+      "strictness": "MANDATORY",
+      "question_template": "Hệ thống có ngăn chặn việc nhảy cóc trạng thái (ví dụ: từ 'PENDING' nhảy thẳng sang 'DELIVERED' bỏ qua bước 'PROCESSING') không?",
+      "recommended_option": "(Recommended) Bắt buộc tuân thủ đồ thị chuyển đổi trạng thái (FSM); vi phạm báo lỗi 409 ILLEGAL_STATE_TRANSITION",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-STOCK-QUOTA-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Resource Quota & Stock Exhaustion",
+      "target_element": "quantity_or_balance_param",
+      "trigger_condition": "has_quota == true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi số lượng yêu cầu vượt quá tồn kho khả dụng hoặc số dư tài khoản không đủ, API phản hồi mã gì?",
+      "recommended_option": "(Recommended) Trả về HTTP 409 CONFLICT kèm mã OUT_OF_STOCK hoặc INSUFFICIENT_BALANCE",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-SOFT-DELETE-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Soft Delete Query Exclusion",
+      "target_element": "delete_endpoint",
+      "trigger_condition": "method == 'DELETE'",
+      "strictness": "MANDATORY",
+      "question_template": "Khi một bản ghi đã bị Soft Delete, các API xem chi tiết (GET) và tìm kiếm có tự động ẩn bản ghi này không?",
+      "recommended_option": "(Recommended) API GET trả về 404 NOT_FOUND, danh sách list tự động lọc bỏ các bản ghi có deleted_at != null",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-HARD-DELETE-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Hard Delete vs Cascading",
+      "target_element": "delete_endpoint",
+      "trigger_condition": "method == 'DELETE'",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi xóa cứng (Hard Delete) một bản ghi cha, các bản ghi con phụ thuộc (Foreign Key) được xóa cascade hay chặn báo lỗi?",
+      "recommended_option": "(Recommended) Chặn xóa với lỗi 409 FOREIGN_KEY_RESTRICT nếu còn dữ liệu con phụ thuộc",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-IMMUTABLE-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Immutable Field Update Rejection",
+      "target_element": "put_or_patch_endpoint",
+      "trigger_condition": "method in ['PUT', 'PATCH']",
+      "strictness": "MANDATORY",
+      "question_template": "Khi Client cố tình cập nhật các trường bất biến (Immutable fields, ví dụ: 'orderId', 'userId', 'createdAt'), API xử lý sao?",
+      "recommended_option": "(Recommended) Từ chối với lỗi 400 IMMUTABLE_FIELD_CANNOT_BE_MODIFIED hoặc âm thầm bỏ qua không cập nhật",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-NOOP-UPDATE-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "No-Op Update Idempotency",
+      "target_element": "put_or_patch_endpoint",
+      "trigger_condition": "method in ['PUT', 'PATCH']",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi Client gửi request update nhưng toàn bộ dữ liệu y hệt dữ liệu hiện tại trong DB, hệ thống có tăng version/updatedAt không?",
+      "recommended_option": "(Recommended) Trả về 200 OK ngay lập tức, không tăng version và không trigger gửi email/webhook thừa",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-TTL-EXPIRE-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Temporary State TTL Expiration",
+      "target_element": "otp_or_temp_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Với các đối tượng có thời gian sống (Mã OTP, Link xác thực, Giữ hàng trong giỏ 15 phút): Khi quá hạn TTL thì API xử lý sao?",
+      "recommended_option": "(Recommended) Báo lỗi 410 GONE hoặc 400 EXPIRED_RESOURCE kèm yêu cầu tạo mã mới",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-ACTIVATION-FLOW-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Account Activation State Flow",
+      "target_element": "user_profile_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi tài khoản đang ở trạng thái 'UNVERIFIED' hoặc 'PENDING_APPROVAL', những API nào bị chặn?",
+      "recommended_option": "(Recommended) Chặn toàn bộ các thao tác nghiệp vụ cốt lõi với lỗi 403 ACCOUNT_NOT_VERIFIED",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-ARCHIVE-READONLY-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Archived Record Read-Only",
+      "target_element": "state_machine_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi bản ghi chuyển sang trạng thái lưu trữ ('ARCHIVED'), có bị khóa chuyển sang chế độ chỉ đọc (Read-only) không?",
+      "recommended_option": "(Recommended) Chặn toàn bộ thao tác sửa/xóa trên bản ghi Archived (409 RECORD_ARCHIVED_READ_ONLY)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-ROLLBACK-STATE-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "State Rollback on Downstream Failure",
+      "target_element": "state_machine_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Nếu chuyển trạng thái đơn hàng sang 'PAID' nhưng bước cấp quyền số thất bại, trạng thái có tự động rollback về 'PAYMENT_PENDING' không?",
+      "recommended_option": "(Recommended) Bắt buộc bọc trong transaction để rollback trạng thái về như cũ nếu có bước con thất bại",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-DEADLOCK-PREVENT-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Bidirectional State Deadlock Prevention",
+      "target_element": "transaction_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi 2 giao dịch đồng thời chuyển đổi trạng thái chéo nhau giữa 2 bản ghi, hệ thống có cơ chế chống Database Deadlock không?",
+      "recommended_option": "(Recommended) Sắp xếp khóa theo thứ tự ID tăng dần để ngăn chặn triệt để Deadlock",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-CYCLE-DETECTION-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Cyclic State Transition Prevention",
+      "target_element": "state_machine_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Đồ thị trạng thái có ngăn chặn vòng lặp vô tận (Infinite State Loop: A -> B -> A) không?",
+      "recommended_option": "(Recommended) Chỉ cho phép các bước chuyển đổi theo đồ thị có hướng hợp lệ",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-CONDITIONAL-TRANS-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Pre-requisite Data for State Transition",
+      "target_element": "state_machine_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Để chuyển trạng thái sang 'COMPLETED', hệ thống có kiểm tra đủ các điều kiện tiên quyết (ví dụ: đã thanh toán đủ 100%, có chữ ký nhận) không?",
+      "recommended_option": "(Recommended) Kiểm tra toàn bộ điều kiện tiên quyết; thiếu điều kiện báo 409 PRECONDITIONS_NOT_MET",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-BATCH-STATE-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Batch State Update Conflict",
+      "target_element": "batch_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi cập nhật trạng thái hàng loạt: Nếu 1 bản ghi trong danh sách không đủ điều kiện chuyển trạng thái, hệ thống xử lý sao?",
+      "recommended_option": "(Recommended) Trả về 207 Multi-Status chi tiết từng item hoặc Rollback toàn bộ (All-or-Nothing) tùy cấu hình",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-AUTO-CANCEL-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Auto-Cancellation Job State Drift",
+      "target_element": "order_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Nếu Cronjob tự động hủy đơn hết hạn chạy cùng lúc với lúc User bấm thanh toán, API xử lý tranh chấp thế nào?",
+      "recommended_option": "(Recommended) Dùng Optimistic Lock; ưu tiên thanh toán nếu giao dịch đã trừ tiền thành công",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-FORCE-CANCEL-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Admin Override State Transition",
+      "target_element": "admin_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Admin có quyền ép chuyển trạng thái (Force Override) bản ghi lỗi không, và có cần ghi lý do vào Audit Log không?",
+      "recommended_option": "(Recommended) Cho phép Admin can thiệp kèm bắt buộc nhập trường 'reason' và lưu Audit Log",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-STATE-TERMINAL-01",
+      "dimension": "5. Finite State Machine & Lifecycle",
+      "category": "Terminal State Immutability",
+      "target_element": "state_machine_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi bản ghi đã đạt trạng thái cuối (Terminal States: 'REFUNDED', 'DESTROYED', 'SETTLED'), mọi thao tác sửa đổi có bị chặn vĩnh viễn không?",
+      "recommended_option": "(Recommended) Tuyệt đối chặn mọi thao tác thay đổi trên trạng thái cuối (409 TERMINAL_STATE_REACHED)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    }
+  ]
+}

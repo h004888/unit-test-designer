@@ -1,0 +1,161 @@
+{
+  "domain": "07_distributed_resilience.json",
+  "rules": [
+    {
+      "id": "H-DIST-OUTBOX-01",
+      "dimension": "7. Distributed Resilience & Outbox",
+      "category": "Transactional Outbox Pattern for Events",
+      "target_element": "event_driven_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi ghi DB thành công nhưng việc phát tán Event sang Message Broker (Kafka/RabbitMQ) bị lỗi, hệ thống xử lý thế nào?",
+      "recommended_option": "(Recommended) Áp dụng Transactional Outbox Pattern: lưu event vào bảng outbox cùng transaction với dữ liệu; đảm bảo không mất event",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DIST-SAGA-ROLLBACK-01",
+      "dimension": "7. Distributed Resilience & Outbox",
+      "category": "Saga Compensating Transaction",
+      "target_element": "distributed_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Trong kiến trúc Microservices: Nếu bước 3 thất bại (ví dụ: trừ kho xong nhưng tạo vận đơn lỗi), cơ chế bù trừ (Compensating Transaction) hoạt động ra sao?",
+      "recommended_option": "(Recommended) Kích hoạt Saga Orchestrator gửi lệnh hoàn tiền và hoàn kho tự động (Compensating action)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DIST-CIRCUIT-BREAKER-01",
+      "dimension": "7. Distributed Resilience & Outbox",
+      "category": "Circuit Breaker Fast-Fail Strategy",
+      "target_element": "external_dependency",
+      "trigger_condition": "has_dependencies == true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi dịch vụ bên thứ ba (Cổng thanh toán, SMS) bị sập liên tục, hệ thống có mở Circuit Breaker để ngắt kết nối tạm thời không?",
+      "recommended_option": "(Recommended) Ngắt kết nối nhanh (Fail-fast) sau 5 lần lỗi liên tiếp; trả về ngay 503 SERVICE_UNAVAILABLE không chờ timeout",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DIST-EVENTUAL-CONSIST-01",
+      "dimension": "7. Distributed Resilience & Outbox",
+      "category": "Eventual Consistency Read Delay",
+      "target_element": "cqrs_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Nếu hệ thống dùng CQRS/Eventual Consistency: Khi User vừa tạo xong bản ghi và chuyển trang xem ngay (Read after write), hệ thống có xử lý độ trễ đồng bộ DB không?",
+      "recommended_option": "(Recommended) Định tuyến đọc từ Master DB cho request đầu tiên ngay sau khi ghi, hoặc trả về dữ liệu tạo mới từ cache",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DIST-MSG-DUPLICATE-01",
+      "dimension": "7. Distributed Resilience & Outbox",
+      "category": "Consumer Idempotency on Duplicated Message",
+      "target_element": "consumer_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi Message Queue giao tin nhắn trùng lặp (At-least-once delivery), Consumer xử lý sao để không cộng dồn 2 lần?",
+      "recommended_option": "(Recommended) Consumer lưu Message-ID vào Redis/DB; nếu ID đã tồn tại thì bỏ qua không thực hiện lại",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DIST-DEAD-LETTER-QUEUE-01",
+      "dimension": "7. Distributed Resilience & Outbox",
+      "category": "Dead Letter Queue (DLQ) Quarantine",
+      "target_element": "async_worker",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi một tin nhắn nghiệp vụ bị lỗi không thể xử lý sau 3 lần retry (Poison message), hệ thống xử lý sao?",
+      "recommended_option": "(Recommended) Đẩy tin nhắn vào Dead Letter Queue (DLQ) để cách ly và gửi cảnh báo Slack/PagerDuty cho kỹ thuật",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DIST-TIMEOUT-FALLBACK-01",
+      "dimension": "7. Distributed Resilience & Outbox",
+      "category": "Dependency Timeout & Graceful Degradation",
+      "target_element": "external_dependency",
+      "trigger_condition": "has_dependencies == true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi dịch vụ ngoài bị nghẽn (Timeout > 5s), API có cơ chế trả về dữ liệu dự phòng (Graceful Degradation / Fallback cache) không?",
+      "recommended_option": "(Recommended) Trả về dữ liệu cache gần nhất kèm cờ warning 'is_cached: true' hoặc trả 503 có cấu trúc",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DIST-CORRELATION-ID-01",
+      "dimension": "7. Distributed Resilience & Outbox",
+      "category": "Distributed Tracing Correlation-ID",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Mỗi request có được cấp một Correlation-ID (hoặc X-Trace-Id) xuyên suốt qua các service để truy vết log phân tán không?",
+      "recommended_option": "(Recommended) Bắt buộc sinh Trace-Id từ API Gateway và truyền qua toàn bộ HTTP Headers / Kafka Headers",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DIST-CLOCK-DRIFT-01",
+      "dimension": "7. Distributed Resilience & Outbox",
+      "category": "Server Clock Drift Handling",
+      "target_element": "distributed_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Nếu đồng hồ giữa các node máy chủ bị lệch vài giây (NTP drift), các thuật toán so sánh thời gian có bị sai lệch không?",
+      "recommended_option": "(Recommended) Dùng đồng hồ logic (Lamport Timestamp) hoặc cho phép ngưỡng tolerance +/- 60 giây",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DIST-BACKPRESSURE-01",
+      "dimension": "7. Distributed Resilience & Outbox",
+      "category": "Backpressure on High Load",
+      "target_element": "stream_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi số lượng request vượt quá năng lực xử lý của hàng đợi, API có kích hoạt Backpressure từ chối bớt kết nối không?",
+      "recommended_option": "(Recommended) Trả về HTTP 503 SERVICE_UNAVAILABLE kèm header Retry-After khi hàng đợi đạt 90% dung lượng",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DIST-DB-FAILOVER-01",
+      "dimension": "7. Distributed Resilience & Outbox",
+      "category": "Database Master-Slave Failover",
+      "target_element": "database_connection",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi Database Master gặp sự cố và cụm đang chuyển giao (Failover) sang Standby node, API phản hồi thế nào?",
+      "recommended_option": "(Recommended) Trả về lỗi 503 Tạm thời gián đoạn trong vài giây chuyển giao, không văng 500 crash ứng dụng",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DIST-CHAOS-RETRY-01",
+      "dimension": "7. Distributed Resilience & Outbox",
+      "category": "Network Jitter & Exponential Backoff",
+      "target_element": "external_client",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi hệ thống gọi ra các API ngoài, chính sách retry có áp dụng Exponential Backoff kèm Jitter (ngẫu nhiên hóa) để chống thắt cổ chai không?",
+      "recommended_option": "(Recommended) Bắt buộc dùng Exponential Backoff kèm Full Jitter cho mọi lệnh gọi mạng",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "domain": "06_concurrency_locking.json",
+  "rules": [
+    {
+      "id": "H-CONC-RACE-01",
+      "dimension": "6. Concurrency, Locking & Quotas",
+      "category": "Race Condition Inventory Double-Spend",
+      "target_element": "inventory_endpoint",
+      "trigger_condition": "has_quota == true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi 2 request đồng thời từ 2 người dùng cùng mua món hàng cuối cùng còn lại trong kho, hệ thống xử lý tranh chấp (concurrency) thế nào?",
+      "recommended_option": "(Recommended) Dùng Optimistic Lock (version) hoặc DB Row Lock: 1 request thành công (201), request thứ 2 nhận 409 OUT_OF_STOCK",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-CONC-RATE-LIMIT-01",
+      "dimension": "6. Concurrency, Locking & Quotas",
+      "category": "Rate Limiting & Retry-After",
+      "target_element": "rate_limited_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi Client vượt quá giới hạn tần suất gọi API (Rate limit), response có trả về Header 'Retry-After' theo RFC 6585 không?",
+      "recommended_option": "(Recommended) Trả về HTTP 429 Too Many Requests kèm header Retry-After: <số giây> và mã RATE_LIMIT_EXCEEDED",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-CONC-ETAG-LOST-UPDATE-01",
+      "dimension": "6. Concurrency, Locking & Quotas",
+      "category": "Lost Update Prevention with If-Match ETag",
+      "target_element": "put_or_patch_endpoint",
+      "trigger_condition": "method in ['PUT', 'PATCH']",
+      "strictness": "MANDATORY",
+      "question_template": "Khi cập nhật bản ghi có header 'If-Match': Nếu ETag/version của Client không khớp với ETag hiện tại trên DB (do người khác đã sửa trước), API xử lý sao?",
+      "recommended_option": "(Recommended) Trả về HTTP 412 Precondition Failed hoặc 409 Conflict để bảo vệ chống ghi đè dữ liệu (Lost Update)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-CONC-BURST-TRAFFIC-01",
+      "dimension": "6. Concurrency, Locking & Quotas",
+      "category": "Burst Traffic & Token Bucket Limit",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Hệ thống áp dụng thuật toán Rate Limit nào (Token Bucket, Leaky Bucket hay Sliding Window)? Có cho phép Burst ngắn hạn không?",
+      "recommended_option": "(Recommended) Áp dụng Token Bucket: cho phép burst nhẹ trong 1 giây nhưng chặn nếu duy trì tần suất cao liên tục",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-CONC-TENANT-QUOTA-01",
+      "dimension": "6. Concurrency, Locking & Quotas",
+      "category": "Per-Tenant Rate Quota Isolation",
+      "target_element": "multi_tenant_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Quota tần suất gọi API có được cô lập theo từng Khách hàng/Tenant không? Tránh việc Tenant A spam làm cạn kiệt tài nguyên của Tenant B?",
+      "recommended_option": "(Recommended) Cô lập quota theo API-Key / Tenant-ID riêng biệt; Tenant A vượt ngưỡng chỉ Tenant A bị 429",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-CONC-PESSIMISTIC-TIMEOUT-01",
+      "dimension": "6. Concurrency, Locking & Quotas",
+      "category": "Pessimistic Lock Timeout Limit",
+      "target_element": "transaction_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi dùng khóa bi quan (SELECT FOR UPDATE), thời gian chờ khóa (Lock Wait Timeout) tối đa là bao nhiêu giây?",
+      "recommended_option": "(Recommended) Giới hạn lock wait timeout tối đa 3 giây; quá thời gian trả về 504 Gateway Timeout hoặc 409 RESOURCE_LOCKED",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-CONC-DIST-LOCK-REDIS-01",
+      "dimension": "6. Concurrency, Locking & Quotas",
+      "category": "Distributed Lock (Redlock) Failure",
+      "target_element": "distributed_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi sử dụng Distributed Lock qua Redis: Nếu Redis sập hoặc lock bị nhả trước khi xử lý xong (Lease timeout), API xử lý sao?",
+      "recommended_option": "(Recommended) Bắt buộc có gia hạn lock tự động (watchdog) và cơ chế fail-safe an toàn",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-CONC-READ-COMMITTED-01",
+      "dimension": "6. Concurrency, Locking & Quotas",
+      "category": "Dirty Read & Transaction Isolation Level",
+      "target_element": "database_transaction",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Mức độ cô lập Transaction trong Database (Isolation Level) là gì (Read Committed hay Serializable)?",
+      "recommended_option": "(Recommended) Tối thiểu mức Read Committed; các giao dịch số dư tài chính nhạy cảm áp dụng Repeatable Read hoặc Serializable",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-CONC-HEAVY-RESOURCE-LIMIT-01",
+      "dimension": "6. Concurrency, Locking & Quotas",
+      "category": "Resource-Intensive Concurrency Throttle",
+      "target_element": "heavy_endpoint",
+      "trigger_condition": "endpoint.path.includes('export') || endpoint.path.includes('report')",
+      "strictness": "MANDATORY",
+      "question_template": "Với các API nặng (Export Excel, Báo cáo thống kê), hệ thống có giới hạn số lượng request chạy song song không?",
+      "recommended_option": "(Recommended) Giới hạn tối đa 2 request export đồng thời trên mỗi user (vượt quá trả 429 EXPORT_IN_PROGRESS)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-CONC-IP-RATE-LIMIT-01",
+      "dimension": "6. Concurrency, Locking & Quotas",
+      "category": "Public Endpoint IP-based Throttling",
+      "target_element": "public_endpoint",
+      "trigger_condition": "endpoint.auth == 'public'",
+      "strictness": "MANDATORY",
+      "question_template": "Với các API Public không cần đăng nhập (Đăng ký, Quên mật khẩu), rate limit được tính theo IP hay Device Fingerprint?",
+      "recommended_option": "(Recommended) Giới hạn 10 request/phút theo IP thực tế để chống bot càn quét",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-CONC-LOCK-ACQUISITION-01",
+      "dimension": "6. Concurrency, Locking & Quotas",
+      "category": "Lock Acquisition Retry Strategy",
+      "target_element": "transaction_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi gặp xung đột Optimistic Lock (Version mismatch), hệ thống tự động retry tối đa mấy lần trước khi báo lỗi về client?",
+      "recommended_option": "(Recommended) Tự động retry tối đa 3 lần với exponential backoff; thất bại cả 3 mới trả 409 CONFLICT",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-CONC-BULKHEAD-ISOLATION-01",
+      "dimension": "6. Concurrency, Locking & Quotas",
+      "category": "Bulkhead Thread Pool Isolation",
+      "target_element": "critical_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Hệ thống có cơ chế Bulkhead để cô lập Thread Pool cho các API quan trọng không, tránh việc API báo cáo ngốn hết thread của API thanh toán?",
+      "recommended_option": "(Recommended) Cô lập thread pool riêng cho các dịch vụ cốt lõi (Core Transaction Pool)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    }
+  ]
+}

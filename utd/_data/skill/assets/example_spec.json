@@ -1,0 +1,83 @@
+{
+  "project": {
+    "name": "Online Shop",
+    "code": "OSHOP",
+    "creator": "Nguyen Van A",
+    "reviewer": "Tran Thi B",
+    "version": "v1.0",
+    "issue_date": "03/11/2026",
+    "reference": "SRS_OSHOP_v1.0, Detailed Design - Pricing module",
+    "environment": "1. Java 17 + JUnit 5 + Mockito\n2. Maven 3.9\n3. JaCoCo (đo branch coverage)",
+    "notes": null
+  },
+  "stats_round": 3,
+  "modules": [
+    {
+      "module_name": "Quadratic Solver",
+      "sheet_name": "QuadraticSolver",
+      "description": "Giải phương trình bậc 2 ax^2 + bx + c = 0 trên tập số thực",
+      "pre_condition": "Không có (hàm thuần, không phụ thuộc bên ngoài)",
+      "methods": [
+        {
+          "name": "solve(double a, double b, double c)",
+          "test_cases": [
+            {"input": {"a": 0, "b": 0, "c": 0}, "expected": {"return": "\"Infinite solutions\""}, "type": "Boundary",
+             "note": "solve_AllZero_ReturnsInfinite | EP: a=0,b=0,c=0"},
+            {"input": {"a": 0, "b": 0, "c": 5}, "expected": {"return": "\"No solution\""}, "type": "Normal",
+             "note": "solve_AZeroBZeroCNonZero_ReturnsNoSolution | Decision table"},
+            {"input": {"a": 0, "b": 2, "c": 1}, "expected": {"return": "\"x = -0.5\""}, "type": "Boundary",
+             "note": "solve_AZeroLinear_ReturnsOneRoot | BVA: a=0 (biên bậc 1/bậc 2)"},
+            {"input": {"a": 1, "b": -3, "c": 2}, "expected": {"return": "\"x1 = 2, x2 = 1\""}, "type": "Normal",
+             "note": "solve_DeltaPositive_ReturnsTwoRoots | EP: delta>0"},
+            {"input": {"a": 1, "b": -2, "c": 1}, "expected": {"return": "\"x1 = x2 = 1\""}, "type": "Boundary",
+             "note": "solve_DeltaZero_ReturnsDoubleRoot | BVA: delta=0"},
+            {"input": {"a": 1, "b": 1, "c": 1}, "expected": {"return": "\"No real roots\""}, "type": "Normal",
+             "note": "solve_DeltaNegative_ReturnsNoRealRoots | EP: delta<0"},
+            {"input": {"a": "Double.NaN", "b": 1, "c": 1}, "expected": {"return": "null",
+             "exception": "IllegalArgumentException", "log": "\"Coefficients must be finite numbers\""}, "type": "Abnormal",
+             "note": "solve_NaNCoefficient_ThrowsException | Error guessing"}
+          ]
+        }
+      ]
+    },
+    {
+      "module_name": "Discount Calculator",
+      "sheet_name": "DiscountCalculator",
+      "description": "Tính tổng tiền sau giảm giá theo số lượng: SL>=10 giảm 5%, SL>=50 giảm 10%",
+      "pre_condition": "price > 0; 1 <= quantity <= 100",
+      "methods": [
+        {
+          "name": "calculateTotal(double price, int quantity)",
+          "test_cases": [
+            {"input": {"price": 100, "quantity": 1}, "expected": {"return": "100.0"}, "type": "Boundary",
+             "note": "calculateTotal_MinQuantity_NoDiscount | BVA: qty=Min"},
+            {"input": {"price": 100, "quantity": 9}, "expected": {"return": "900.0"}, "type": "Boundary",
+             "note": "calculateTotal_Quantity9_NoDiscount | BVA: qty=10-1"},
+            {"input": {"price": 100, "quantity": 10}, "expected": {"return": "950.0"}, "type": "Boundary",
+             "note": "calculateTotal_Quantity10_Discount5 | BVA: qty=10"},
+            {"input": {"price": 100, "quantity": 49}, "expected": {"return": "4655.0"}, "type": "Boundary",
+             "note": "calculateTotal_Quantity49_Discount5 | BVA: qty=50-1"},
+            {"input": {"price": 100, "quantity": 50}, "expected": {"return": "4500.0"}, "type": "Boundary",
+             "note": "calculateTotal_Quantity50_Discount10 | BVA: qty=50"},
+            {"input": {"price": 100, "quantity": 100}, "expected": {"return": "9000.0"}, "type": "Boundary",
+             "note": "calculateTotal_MaxQuantity_Discount10 | BVA: qty=Max"},
+            {"input": {"price": 19.99, "quantity": 20}, "expected": {"return": "379.81"}, "type": "Normal",
+             "note": "calculateTotal_DecimalPrice_Discount5 | EP: price hợp lệ, số lẻ"},
+            {"input": {"price": 100, "quantity": 0}, "expected": {"return": "null", "exception": "IllegalArgumentException",
+             "log": "\"Quantity must be between 1 and 100\""}, "type": "Abnormal",
+             "note": "calculateTotal_QuantityZero_ThrowsException | BVA: qty=Min-1"},
+            {"input": {"price": 100, "quantity": 101}, "expected": {"return": "null", "exception": "IllegalArgumentException",
+             "log": "\"Quantity must be between 1 and 100\""}, "type": "Abnormal",
+             "note": "calculateTotal_QuantityOverMax_ThrowsException | BVA: qty=Max+1"},
+            {"input": {"price": 0, "quantity": 5}, "expected": {"return": "null", "exception": "IllegalArgumentException",
+             "log": "\"Price must be greater than 0\""}, "type": "Abnormal",
+             "note": "calculateTotal_PriceZero_ThrowsException | BVA: price=0"},
+            {"input": {"price": -1, "quantity": 5}, "expected": {"return": "null", "exception": "IllegalArgumentException",
+             "log": "\"Price must be greater than 0\""}, "type": "Abnormal",
+             "note": "calculateTotal_NegativePrice_ThrowsException | Error guessing: số âm"}
+          ]
+        }
+      ]
+    }
+  ]
+}

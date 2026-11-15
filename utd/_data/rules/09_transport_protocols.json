@@ -1,0 +1,109 @@
+{
+  "domain": "09_transport_protocols.json",
+  "rules": [
+    {
+      "id": "H-TRANS-CTYPE-01",
+      "dimension": "9. Transport, Headers & Protocols",
+      "category": "Content-Type Negotiation",
+      "target_element": "all_endpoints",
+      "trigger_condition": "method in ['POST', 'PUT', 'PATCH']",
+      "strictness": "MANDATORY",
+      "question_template": "Khi Client gửi body nhưng sai Header Content-Type (ví dụ: text/plain, application/xml hoặc thiếu header này), API phản hồi thế nào?",
+      "recommended_option": "(Recommended) Trả về HTTP 415 Unsupported Media Type",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-TRANS-ACCEPT-01",
+      "dimension": "9. Transport, Headers & Protocols",
+      "category": "Accept Header Negotiation",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi Client gửi Header 'Accept: application/xml' mà server chỉ hỗ trợ JSON, API xử lý sao?",
+      "recommended_option": "(Recommended) Trả về HTTP 406 Not Acceptable (hoặc fallback mặc định về application/json)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-TRANS-IP-SPOOF-01",
+      "dimension": "9. Transport, Headers & Protocols",
+      "category": "IP Spoofing via X-Forwarded-For",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Hệ thống có cấu hình tin tưởng Proxy an toàn (Trust Proxy) không, hay tin tưởng mù quáng header X-Forwarded-For do Client tự gửi để fake IP?",
+      "recommended_option": "(Recommended) Chỉ lấy IP từ hop cuối cùng của Reverse Proxy/Cloudflare đáng tin cậy để chống fake IP bypass rate-limit",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-TRANS-CORS-OPTIONS-01",
+      "dimension": "9. Transport, Headers & Protocols",
+      "category": "CORS Preflight OPTIONS Response",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi trình duyệt gửi request OPTIONS (CORS Preflight), API có phản hồi đầy đủ các header Access-Control-Allow-Methods/Headers và trả 204/200 không?",
+      "recommended_option": "(Recommended) Trả về HTTP 204 No Content hoặc 200 OK với đầy đủ các header CORS cho phép",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-TRANS-PAYLOAD-MAX-01",
+      "dimension": "9. Transport, Headers & Protocols",
+      "category": "Payload Too Large Limit",
+      "target_element": "all_endpoints",
+      "trigger_condition": "method in ['POST', 'PUT']",
+      "strictness": "MANDATORY",
+      "question_template": "Kích thước Body request tối đa cho phép là bao nhiêu (ví dụ: 10MB cho file, 2MB cho JSON)? Vượt quá trả mã nào?",
+      "recommended_option": "(Recommended) Vượt quá giới hạn trả về HTTP 413 Payload Too Large",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-TRANS-ZIP-BOMB-01",
+      "dimension": "9. Transport, Headers & Protocols",
+      "category": "Decompression Bomb Protection",
+      "target_element": "compression_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Nếu API hỗ trợ giải nén Content-Encoding: gzip/deflate, có cơ chế chống Zip-Bomb làm cạn RAM máy chủ không?",
+      "recommended_option": "(Recommended) Giới hạn kích thước tối đa sau giải nén không quá 20MB",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-TRANS-SEC-HEADERS-01",
+      "dimension": "9. Transport, Headers & Protocols",
+      "category": "Standard HTTP Security Headers",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Response trả về có bắt buộc các Header an ninh: X-Content-Type-Options: nosniff, Strict-Transport-Security (HSTS) không?",
+      "recommended_option": "(Recommended) Luôn bổ sung đầy đủ các header bảo mật HTTP trong mọi response",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-TRANS-KEEP-ALIVE-01",
+      "dimension": "9. Transport, Headers & Protocols",
+      "category": "Connection Keep-Alive & Timeout",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Thời gian timeout giữ kết nối Keep-Alive tối đa là bao nhiêu giây?",
+      "recommended_option": "(Recommended) Timeout Keep-Alive mặc định 60 giây để tối ưu tài nguyên server",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    }
+  ]
+}

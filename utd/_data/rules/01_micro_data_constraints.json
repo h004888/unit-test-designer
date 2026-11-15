@@ -1,0 +1,330 @@
+{
+  "domain": "01_micro_data_constraints.json",
+  "rules": [
+    {
+      "id": "H-DATA-STR-01",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "String Empty & Whitespace",
+      "target_element": "string_param",
+      "trigger_condition": "param.type == 'string'",
+      "strictness": "MANDATORY",
+      "question_template": "Với trường '{param_name}', hệ thống xử lý thế nào khi Client gửi chuỗi rỗng \"\" hoặc toàn khoảng trắng \"   \"?",
+      "recommended_option": "(Recommended) Trả về lỗi 400 Bad Request kèm mã lỗi FIELD_EMPTY/FIELD_REQUIRED",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-STR-02",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "String Length Bounds",
+      "target_element": "string_param",
+      "trigger_condition": "param.type == 'string'",
+      "strictness": "MANDATORY",
+      "question_template": "Trường '{param_name}' có giới hạn độ dài [Min..Max]. Khi vượt quá Max+1 hoặc dưới Min-1 ký tự thì API phản hồi thế nào?",
+      "recommended_option": "(Recommended) Báo lỗi 400 Bad Request kèm mã STRING_LENGTH_OUT_OF_RANGE",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-STR-03",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Unicode & Emoji",
+      "target_element": "string_param",
+      "trigger_condition": "param.type == 'string'",
+      "strictness": "CONDITIONAL",
+      "question_template": "Trường '{param_name}' có hỗ trợ đầy đủ ký tự Unicode đa ngôn ngữ (Tiếng Việt có dấu, CJK) và Emoji 4-byte (😍, 👨‍👩‍👧‍👦) không?",
+      "recommended_option": "(Recommended) Hỗ trợ đầy đủ UTF-8 / UTF-8MB4, lưu đúng và không làm vỡ font/dữ liệu (200/201)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-STR-04",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "SQL & Script Injection",
+      "target_element": "string_param",
+      "trigger_condition": "param.type == 'string'",
+      "strictness": "MANDATORY",
+      "question_template": "Khi trường '{param_name}' chứa cú pháp SQL Injection (\"' OR '1'='1\") hoặc Script Injection (\"<script>alert(1)</script>\"), hệ thống xử lý thế nào?",
+      "recommended_option": "(Recommended) Lưu dạng text an toàn (Parameterized Query & Escaped) hoặc chặn báo 400 INVALID_INPUT",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-STR-05",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Path Traversal",
+      "target_element": "file_or_path_param",
+      "trigger_condition": "param.name.includes('path') || param.name.includes('file')",
+      "strictness": "MANDATORY",
+      "question_template": "Khi tham số '{param_name}' chứa ký tự Path Traversal ('../../etc/passwd' hoặc '..\\\\Windows'), API xử lý sao?",
+      "recommended_option": "(Recommended) Chặn lập tức với lỗi 400 Bad Request kèm mã PATH_TRAVERSAL_DETECTED",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-STR-06",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "ReDoS Regex Denial of Service",
+      "target_element": "string_param",
+      "trigger_condition": "param.type == 'string'",
+      "strictness": "MANDATORY",
+      "question_template": "Chuỗi '{param_name}' kiểm tra định dạng bằng Regex nào? Hệ thống có giới hạn thời gian thực thi Regex (Timeout < 500ms) để chống ReDoS treo CPU không?",
+      "recommended_option": "(Recommended) Giới hạn độ dài tối đa trước khi chạy regex và áp dụng Timeout 500ms cho regex engine",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-STR-07",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Password Trailing Spaces",
+      "target_element": "password_param",
+      "trigger_condition": "param.name.includes('pass') || param.name.includes('pwd')",
+      "strictness": "MANDATORY",
+      "question_template": "Với mật khẩu '{param_name}', khoảng trắng ở đầu hoặc cuối có bị tự động cắt (trim) không? (Chuẩn NIST cấm trim mật khẩu)",
+      "recommended_option": "(Recommended) Giữ nguyên vẹn toàn bộ khoảng trắng theo chuẩn NIST, không được tự ý trim mật khẩu",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-STR-08",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Email RFC 5322 Format",
+      "target_element": "email_param",
+      "trigger_condition": "param.name.includes('email')",
+      "strictness": "MANDATORY",
+      "question_template": "Trường email '{param_name}' validate theo chuẩn RFC 5322 thế nào? Có chấp nhận ký tự '+' (sub-addressing: user+tag@domain.com) không?",
+      "recommended_option": "(Recommended) Chấp nhận email hợp lệ có dấu '+' và subdomain; từ chối email thiếu '@' hoặc thiếu domain (400 INVALID_EMAIL)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-STR-09",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Phone Number E.164",
+      "target_element": "phone_param",
+      "trigger_condition": "param.name.includes('phone') || param.name.includes('mobile')",
+      "strictness": "MANDATORY",
+      "question_template": "Số điện thoại '{param_name}' có bắt buộc theo chuẩn quốc tế E.164 (+84xxxxxxxxx) không? Có cho phép khoảng trắng/dấu gạch nối không?",
+      "recommended_option": "(Recommended) Tự động chuẩn hóa về E.164 (bỏ khoảng trắng, dấu gạch nối) hoặc yêu cầu chuẩn E.164 từ đầu",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-STR-10",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "UUID Format Version",
+      "target_element": "uuid_param",
+      "trigger_condition": "param.name.includes('id') || param.format == 'uuid'",
+      "strictness": "MANDATORY",
+      "question_template": "Trường ID '{param_name}' yêu cầu định dạng UUID v4 hay v7? Khi truyền chuỗi không đúng chuẩn UUID (ví dụ: '123' hoặc thiếu dấu gạch nối) thì trả mã gì?",
+      "recommended_option": "(Recommended) Trả về lỗi 400 Bad Request kèm mã INVALID_UUID_FORMAT",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-STR-11",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "GPS Coordinates Bounds",
+      "target_element": "geo_param",
+      "trigger_condition": "param.name.includes('lat') || param.name.includes('lng')",
+      "strictness": "MANDATORY",
+      "question_template": "Tọa độ GPS '{param_name}' có giới hạn chặt chẽ Latitude [-90, 90] và Longitude [-180, 180] không? Khi vượt biên thì API trả mã gì?",
+      "recommended_option": "(Recommended) Báo lỗi 400 Bad Request kèm mã GEO_COORDINATES_OUT_OF_BOUNDS",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-STR-12",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Zero-Width Characters",
+      "target_element": "string_param",
+      "trigger_condition": "param.type == 'string'",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi chuỗi '{param_name}' chứa ký tự tàng hình (Zero-Width Space \\u200B, \\u200C, \\uFEFF), API xử lý sao?",
+      "recommended_option": "(Recommended) Tự động lọc sạch các ký tự tàng hình/điều khiển để bảo vệ toàn vẹn dữ liệu tìm kiếm",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-NUM-01",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Numeric Zero & Negative",
+      "target_element": "integer_or_number_param",
+      "trigger_condition": "param.type in ['integer', 'number']",
+      "strictness": "MANDATORY",
+      "question_template": "Với trường số '{param_name}', giá trị 0 hoặc số âm (-1, -99) có hợp lệ không?",
+      "recommended_option": "(Recommended) Từ chối số âm và số 0 với mã lỗi 400 Bad Request (chỉ nhận số nguyên dương >= 1)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-NUM-02",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Numeric Type Coercion & Decimals",
+      "target_element": "integer_param",
+      "trigger_condition": "param.type == 'integer'",
+      "strictness": "MANDATORY",
+      "question_template": "Trường '{param_name}' là số nguyên. Nếu Client gửi số thập phân (1.5) hoặc chuỗi số (\"10\"), hệ thống phản hồi thế nào?",
+      "recommended_option": "(Recommended) Từ chối số thập phân với lỗi 400 INVALID_DATA_TYPE; tự động parse chuỗi số nếu cấu hình cho phép",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-NUM-03",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Numeric Overflow 32/64-bit",
+      "target_element": "integer_or_number_param",
+      "trigger_condition": "param.type in ['integer', 'number']",
+      "strictness": "MANDATORY",
+      "question_template": "Nếu Client truyền giá trị số vượt giới hạn Integer 32-bit (2147483648) hoặc 64-bit, API phản hồi thế nào?",
+      "recommended_option": "(Recommended) Báo lỗi 400 NUMBER_OUT_OF_RANGE, không để sập hệ thống (500) hoặc tràn số âm",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-NUM-04",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Business Thresholds",
+      "target_element": "integer_or_number_param",
+      "trigger_condition": "param.type in ['integer', 'number']",
+      "strictness": "MANDATORY",
+      "question_template": "Với ngưỡng điều kiện '{threshold_desc}', hệ thống xử lý tại điểm giáp ranh (Threshold-1 và Threshold) như thế nào?",
+      "recommended_option": "(Recommended) Tại Threshold-1: áp dụng mức thường; tại Threshold: kích hoạt điều kiện nghiệp vụ chính xác",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-NUM-05",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Banker's Rounding vs Half-Up",
+      "target_element": "monetary_param",
+      "trigger_condition": "param.name.includes('price') || param.name.includes('amount')",
+      "strictness": "MANDATORY",
+      "question_template": "Khi tính toán làm tròn tiền tệ '{param_name}', hệ thống áp dụng quy tắc Round Half-Up hay Round Half-Even (Banker's Rounding)?",
+      "recommended_option": "(Recommended) Áp dụng Banker's Rounding (Round Half-Even) để triệt tiêu sai số cộng dồn kế toán",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-NUM-06",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Floating Point Precision Loss",
+      "target_element": "monetary_param",
+      "trigger_condition": "param.name.includes('price') || param.name.includes('total')",
+      "strictness": "MANDATORY",
+      "question_template": "Dữ liệu tiền tệ '{param_name}' có dùng kiểu số nguyên (cents) hoặc BigDecimal không, hay dùng float/double dễ bị lỗi sai số IEEE 754 (0.1+0.2 != 0.3)?",
+      "recommended_option": "(Recommended) Bắt buộc dùng BigDecimal hoặc lưu đơn vị tiền tệ nhỏ nhất dạng số nguyên (integer cents)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-ARR-01",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Array Empty Bounds",
+      "target_element": "array_param",
+      "trigger_condition": "param.type == 'array'",
+      "strictness": "MANDATORY",
+      "question_template": "Với trường mảng '{param_name}', khi Client gửi mảng rỗng [] thì hệ thống phản hồi thế nào?",
+      "recommended_option": "(Recommended) Báo lỗi 400 Bad Request kèm mã ARRAY_MIN_ITEMS nếu bắt buộc có ít nhất 1 phần tử",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-ARR-02",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Array Duplicates",
+      "target_element": "array_param",
+      "trigger_condition": "param.type == 'array'",
+      "strictness": "MANDATORY",
+      "question_template": "Khi mảng '{param_name}' chứa các phần tử trùng lặp (ví dụ: [\"ID1\", \"ID1\"]), hệ thống xử lý thế nào?",
+      "recommended_option": "(Recommended) Tự động loại bỏ trùng lặp (Deduplicate) hoặc báo lỗi 400 DUPLICATE_ARRAY_ITEMS",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-ARR-03",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Array Max Items Limit",
+      "target_element": "array_param",
+      "trigger_condition": "param.type == 'array'",
+      "strictness": "MANDATORY",
+      "question_template": "Mảng '{param_name}' có giới hạn số phần tử tối đa (Max Items, ví dụ: tối đa 100 items/request) để chống nghẽn bộ nhớ không?",
+      "recommended_option": "(Recommended) Giới hạn tối đa 100 items; vượt quá báo lỗi 400 ARRAY_MAX_ITEMS_EXCEEDED",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-DATE-01",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "ISO 8601 Date Format",
+      "target_element": "date_param",
+      "trigger_condition": "param.format in ['date', 'date-time']",
+      "strictness": "MANDATORY",
+      "question_template": "Với trường ngày tháng '{param_name}', định dạng bắt buộc (ISO 8601) và xử lý ngày quá khứ/tương lai ra sao?",
+      "recommended_option": "(Recommended) Bắt buộc chuẩn ISO 8601 UTC; từ chối ngày trong quá khứ nếu là lịch hẹn (400 INVALID_DATE_RANGE)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-DATE-02",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Leap Year & 29 Feb",
+      "target_element": "date_param",
+      "trigger_condition": "param.format in ['date', 'date-time']",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi Client gửi ngày 29/02 vào năm không nhuận (ví dụ: 2023-02-29), API xử lý sao?",
+      "recommended_option": "(Recommended) Báo lỗi 400 Bad Request kèm mã INVALID_CALENDAR_DATE",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-JSON-01",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "JSON Max Nesting Depth",
+      "target_element": "json_body",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Body JSON có bị giới hạn độ sâu lồng nhau (Max Nesting Depth <= 5 cấp) để chống DoS tràn ngăn xếp bộ nhớ không?",
+      "recommended_option": "(Recommended) Giới hạn tối đa 5 cấp lồng nhau; sâu hơn báo lỗi 400 PAYLOAD_TOO_COMPLEX",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-DATA-ENUM-01",
+      "dimension": "1. Micro-Data Constraints",
+      "category": "Enum Case Sensitivity",
+      "target_element": "enum_param",
+      "trigger_condition": "param.enum != null",
+      "strictness": "MANDATORY",
+      "question_template": "Với trường Enum '{param_name}', khi Client gửi sai hoặc viết hoa/thường lệch (case-sensitive), API xử lý sao?",
+      "recommended_option": "(Recommended) Báo lỗi 400 Bad Request kèm mã INVALID_ENUM_VALUE và danh sách giá trị được phép",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    }
+  ]
+}

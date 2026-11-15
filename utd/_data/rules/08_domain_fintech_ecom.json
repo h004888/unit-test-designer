@@ -1,0 +1,239 @@
+{
+  "domain": "08_domain_fintech_ecom.json",
+  "rules": [
+    {
+      "id": "H-FIN-STACK-VOUCHER-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Voucher Stacking Conflict",
+      "target_element": "voucher_param",
+      "trigger_condition": "param.name.includes('voucher') || param.name.includes('coupon')",
+      "strictness": "MANDATORY",
+      "question_template": "Mã giảm giá '{param_name}' có được dùng chung với mã khác hoặc chương trình khuyến mãi khác không? Nếu vi phạm thì API phản hồi thế nào?",
+      "recommended_option": "(Recommended) Trả về 409 CONFLICT kèm mã VOUCHER_NOT_STACKABLE",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-EXCHANGE-DRIFT-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Exchange Rate Drift on Checkout",
+      "target_element": "multicurrency_endpoint",
+      "trigger_condition": "has_currency == true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi thanh toán bằng ngoại tệ: Tỷ giá hối đoái tại lúc xem giỏ hàng vs lúc bấm thanh toán bị lệch thì tính theo tỷ giá nào?",
+      "recommended_option": "(Recommended) Khóa giữ tỷ giá trong 15 phút phiên checkout; quá 15 phút cập nhật lại tỷ giá mới kèm thông báo xác nhận (409 RATE_EXPIRED)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-REFUND-MAX-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Refund Exceeding Paid Total",
+      "target_element": "refund_endpoint",
+      "trigger_condition": "endpoint.path.includes('refund')",
+      "strictness": "MANDATORY",
+      "question_template": "Khi gọi API hoàn tiền, nếu số tiền hoàn lớn hơn số tiền khách thực trả (sau khi trừ voucher) hoặc đơn đã được hoàn một phần trước đó, API xử lý sao?",
+      "recommended_option": "(Recommended) Báo lỗi 409 CONFLICT kèm mã REFUND_AMOUNT_EXCEEDS_PAID_TOTAL",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-PARTIAL-PAY-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Partial Payment Handling",
+      "target_element": "payment_endpoint",
+      "trigger_condition": "endpoint.path.includes('pay')",
+      "strictness": "MANDATORY",
+      "question_template": "Nếu khách chỉ thanh toán một phần số tiền đơn hàng (thiếu tiền), trạng thái đơn hàng và số tiền còn thiếu được lưu trữ thế nào?",
+      "recommended_option": "(Recommended) Cập nhật trạng thái 'PARTIALLY_PAID', ghi nhận 'remaining_amount' và hạn chót thanh toán nốt",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-MIN-TRANSACTION-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Minimum Transaction Amount Limit",
+      "target_element": "monetary_param",
+      "trigger_condition": "param.name.includes('amount')",
+      "strictness": "MANDATORY",
+      "question_template": "Giao dịch thanh toán có giới hạn số tiền tối thiểu (ví dụ: tối thiểu 10,000 VNĐ) do phí cổng thanh toán không?",
+      "recommended_option": "(Recommended) Từ chối các giao dịch dưới mức tối thiểu với lỗi 400 TRANSACTION_AMOUNT_BELOW_MINIMUM",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-DOUBLE-SPEND-WALLET-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "E-Wallet Double-Spend Prevention",
+      "target_element": "wallet_endpoint",
+      "trigger_condition": "endpoint.path.includes('wallet')",
+      "strictness": "MANDATORY",
+      "question_template": "Khi thanh toán bằng ví điện tử: Hệ thống có khóa số dư (Balance Lock) trong lúc gọi cổng thanh toán để chống trừ tiền âm không?",
+      "recommended_option": "(Recommended) Khóa trừ số dư khả dụng (Available Balance) ngay khi tạo lệnh; thất bại thì hoàn lại",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-VOUCHER-MIN-ORDER-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Voucher Minimum Order Value",
+      "target_element": "voucher_param",
+      "trigger_condition": "param.name.includes('voucher')",
+      "strictness": "MANDATORY",
+      "question_template": "Khi đơn hàng chưa đạt giá trị tối thiểu để áp dụng mã giảm giá (ví dụ: đơn từ 500k mới giảm 50k), API phản hồi mã lỗi gì?",
+      "recommended_option": "(Recommended) Báo lỗi 400 Bad Request kèm mã ORDER_VALUE_BELOW_VOUCHER_MINIMUM",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-VOUCHER-USAGE-LIMIT-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Voucher Global/User Usage Limit",
+      "target_element": "voucher_param",
+      "trigger_condition": "param.name.includes('voucher')",
+      "strictness": "MANDATORY",
+      "question_template": "Khi mã giảm giá đã hết lượt sử dụng toàn hệ thống hoặc người dùng này đã dùng hết số lần cho phép, API trả mã gì?",
+      "recommended_option": "(Recommended) Trả về 409 CONFLICT kèm mã VOUCHER_USAGE_LIMIT_EXCEEDED",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-TAX-CALCULATION-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Tax & VAT Calculation Rounding",
+      "target_element": "checkout_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Thuế VAT (8% hoặc 10%) được tính trên từng sản phẩm rồi cộng lại hay tính trên tổng tiền đơn hàng? Làm tròn ở bước nào?",
+      "recommended_option": "(Recommended) Tính VAT trên tổng giá trị sau giảm giá và làm tròn Banker's Rounding ở bước cuối cùng",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-SHIPPING-REFUND-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Shipping Fee Refund Policy",
+      "target_element": "refund_endpoint",
+      "trigger_condition": "endpoint.path.includes('refund')",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi hủy đơn do lỗi người bán vs do khách đổi ý: Phí vận chuyển có được hoàn lại cho khách không?",
+      "recommended_option": "(Recommended) Tách bạch rõ ràng: Hoàn phí ship nếu lỗi hệ thống/người bán; không hoàn phí ship nếu do khách",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-EXPIRED-PAYMENT-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Payment Gateway Expired Callback",
+      "target_element": "payment_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi cổng thanh toán báo thanh toán thành công nhưng đơn hàng trên hệ thống đã bị tự động hủy do quá hạn 15 phút, API xử lý thế nào?",
+      "recommended_option": "(Recommended) Tự động ghi nhận giao dịch treo và kích hoạt luồng hoàn tiền tự động (Auto-refund) cho khách",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-CART-ITEM-PRICE-CHANGE-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Price Change Detection on Checkout",
+      "target_element": "checkout_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Nếu giá sản phẩm bị thay đổi trong DB trong lúc khách đang ở trang thanh toán, hệ thống có cảnh báo và yêu cầu xác nhận giá mới không?",
+      "recommended_option": "(Recommended) Báo lỗi 409 CONFLICT kèm mã PRODUCT_PRICE_CHANGED và trả về giá mới",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-DISCOUNT-OVER-TOTAL-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Discount Exceeding Order Total",
+      "target_element": "checkout_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Nếu tổng số tiền giảm giá lớn hơn tổng giá trị đơn hàng, tổng tiền thanh toán cuối cùng có bị âm không?",
+      "recommended_option": "(Recommended) Tuyệt đối chặn tiền âm; số tiền thanh toán tối thiểu là 0 VNĐ",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-CROSS-BORDER-CURRENCY-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Supported Currency Whitelist",
+      "target_element": "monetary_param",
+      "trigger_condition": "param.name.includes('currency')",
+      "strictness": "MANDATORY",
+      "question_template": "Hệ thống chỉ chấp nhận những loại tiền tệ nào (VND, USD, EUR)? Khi gửi mã tiền tệ không hỗ trợ, API trả mã gì?",
+      "recommended_option": "(Recommended) Kiểm tra theo Whitelist tiền tệ; mã lạ trả về 400 UNSUPPORTED_CURRENCY",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-INVENTORY-RESERVATION-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Inventory Hold vs Release TTL",
+      "target_element": "inventory_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi khách bắt đầu thanh toán, hàng có được tạm giữ (Reserved stock) trong 15 phút không? Nếu không trả tiền thì kho tự nhả ra sao?",
+      "recommended_option": "(Recommended) Tạm giữ tồn kho với TTL 15 phút; quá hạn tự động giải phóng tồn kho về khả dụng",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-CREDIT-LIMIT-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Customer Credit Limit Verification",
+      "target_element": "b2b_checkout",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Với khách hàng doanh nghiệp (B2B mua công nợ): Khi tổng dư nợ vượt hạn mức tín dụng cho phép, đơn hàng có bị chặn không?",
+      "recommended_option": "(Recommended) Báo lỗi 409 CONFLICT kèm mã CREDIT_LIMIT_EXCEEDED",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-COMMISSION-SPLIT-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Marketplace Seller Commission Split",
+      "target_element": "marketplace_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Với sàn thương mại điện tử: Tiền đơn hàng được chia tỷ lệ (Split payment) cho người bán và sàn như thế nào khi có voucher sàn?",
+      "recommended_option": "(Recommended) Tách bạch phần bù giá của sàn và tiền thực nhận của seller theo hợp đồng",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-FIN-ESCROW-HOLD-01",
+      "dimension": "8. Domain-Specific Scenarios (Fintech/E-com)",
+      "category": "Escrow Fund Release Condition",
+      "target_element": "escrow_endpoint",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Tiền thanh toán có được giữ ở tài khoản đảm bảo (Escrow) không? Khi nào tiền mới được chuyển cho người bán?",
+      "recommended_option": "(Recommended) Giữ tiền ký quỹ cho đến khi khách xác nhận đã nhận hàng hoặc quá hạn khiếu nại",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    }
+  ]
+}

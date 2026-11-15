@@ -1,0 +1,492 @@
+{
+  "project": {
+    "name": "Online Shop",
+    "code": "OSHOP",
+    "creator": "Nguyen Van A",
+    "reviewer": "Tran Thi B",
+    "version": "v1.0",
+    "issue_date": "03/11/2026",
+    "reference": "SRS_OSHOP_v1.0 mục 3.2; API Design Doc v1.0",
+    "environment": "1. Java 17 + Spring Boot 3 + JUnit 5 + MockMvc\n2. Mockito (mock ProductRepository, OrderRepository)\n3. JaCoCo (đo branch coverage)"
+  },
+  "stats_round": 3,
+  "modules": [
+    {
+      "module_name": "Order API",
+      "sheet_name": "POST_api_orders",
+      "description": "Tạo đơn hàng mới cho người dùng đang đăng nhập. SL >= 10 được giảm 5% trên tổng tiền.",
+      "pre_condition": "DB test đã seed: P001 (price=100, stock=500), P002 (price=50, stock=5). User alice (id=1), bob (id=2).",
+      "methods": [
+        {
+          "name": "createOrder",
+          "api": {
+            "http_method": "POST",
+            "path": "/api/orders",
+            "summary": "Tạo đơn hàng mới cho người dùng đang đăng nhập. SL >= 10 được giảm 5% trên tổng tiền.",
+            "source": "SRS_OSHOP_v1.0 mục 3.2.1",
+            "auth": "Bearer JWT (bắt buộc)",
+            "request": [
+              {
+                "name": "Authorization",
+                "in": "header",
+                "type": "string",
+                "required": true,
+                "constraints": "Bearer <JWT hợp lệ>"
+              },
+              {
+                "name": "productId",
+                "in": "body",
+                "type": "string",
+                "required": true,
+                "constraints": "Phải tồn tại trong hệ thống"
+              },
+              {
+                "name": "quantity",
+                "in": "body",
+                "type": "integer",
+                "required": true,
+                "constraints": "1 <= quantity <= 100 và <= tồn kho"
+              }
+            ],
+            "responses": [
+              {
+                "status": 201,
+                "description": "Tạo thành công, trả về orderId và total"
+              },
+              {
+                "status": 400,
+                "error_code": "VALIDATION_ERROR",
+                "description": "Thiếu/sai kiểu/ngoài khoảng giá trị"
+              },
+              {
+                "status": 401,
+                "error_code": "UNAUTHORIZED",
+                "description": "Thiếu hoặc sai token"
+              },
+              {
+                "status": 404,
+                "error_code": "PRODUCT_NOT_FOUND",
+                "description": "productId không tồn tại"
+              },
+              {
+                "status": 409,
+                "error_code": "OUT_OF_STOCK",
+                "description": "quantity vượt tồn kho"
+              }
+            ],
+            "rules": [
+              {
+                "id": "BR-01",
+                "text": "productId là bắt buộc và phải tồn tại",
+                "source": "SRS 3.2.1.a"
+              },
+              {
+                "id": "BR-02",
+                "text": "quantity là số nguyên trong khoảng 1..100",
+                "source": "SRS 3.2.1.b"
+              },
+              {
+                "id": "BR-03",
+                "text": "quantity không được vượt quá tồn kho",
+                "source": "SRS 3.2.1.c"
+              },
+              {
+                "id": "BR-04",
+                "text": "quantity >= 10 thì giảm 5% tổng tiền",
+                "source": "SRS 3.2.1.d"
+              },
+              {
+                "id": "BR-05",
+                "text": "Yêu cầu token đăng nhập hợp lệ",
+                "source": "SRS 2.1 Security"
+              }
+            ]
+          },
+          "test_cases": [
+            {
+              "pre": "P001: price=100, stock=500",
+              "input": "header.Authorization=Bearer <valid>; body.productId=P001; body.quantity=5",
+              "expected": {
+                "return": "HTTP 201; body {\"orderId\":1,\"total\":500.0}"
+              },
+              "type": "Normal",
+              "rule_refs": [
+                "BR-01",
+                "BR-02",
+                "BR-03"
+              ],
+              "note": "createOrder_ValidQuantity5_Returns201 | EP: valid happy path",
+              "id": "UTC001"
+            },
+            {
+              "pre": "P001: price=100, stock=500",
+              "input": "header.Authorization=Bearer <valid>; body.productId=P001; body.quantity=1",
+              "expected": {
+                "return": "HTTP 201; body {\"orderId\":1,\"total\":100.0}"
+              },
+              "type": "Boundary",
+              "rule_refs": [
+                "BR-02"
+              ],
+              "note": "createOrder_Quantity1_Returns201 | BVA: qty=Min",
+              "id": "UTC002"
+            },
+            {
+              "pre": "P001: price=100, stock=500",
+              "input": "header.Authorization=Bearer <valid>; body.productId=P001; body.quantity=9",
+              "expected": {
+                "return": "HTTP 201; body {\"orderId\":1,\"total\":900.0}"
+              },
+              "type": "Boundary",
+              "rule_refs": [
+                "BR-04"
+              ],
+              "note": "createOrder_Quantity9_NoDiscount | BVA: qty=10-1",
+              "id": "UTC003"
+            },
+            {
+              "pre": "P001: price=100, stock=500",
+              "input": "header.Authorization=Bearer <valid>; body.productId=P001; body.quantity=10",
+              "expected": {
+                "return": "HTTP 201; body {\"orderId\":1,\"total\":950.0}"
+              },
+              "type": "Boundary",
+              "rule_refs": [
+                "BR-04"
+              ],
+              "note": "createOrder_Quantity10_Discount5 | BVA: qty=10",
+              "id": "UTC004"
+            },
+            {
+              "pre": "P001: price=100, stock=500",
+              "input": "header.Authorization=Bearer <valid>; body.productId=P001; body.quantity=100",
+              "expected": {
+                "return": "HTTP 201; body {\"orderId\":1,\"total\":9500.0}"
+              },
+              "type": "Boundary",
+              "rule_refs": [
+                "BR-02",
+                "BR-04"
+              ],
+              "note": "createOrder_Quantity100_Returns201 | BVA: qty=Max",
+              "id": "UTC005"
+            },
+            {
+              "pre": "P002: price=50, stock=5",
+              "input": "header.Authorization=Bearer <valid>; body.productId=P002; body.quantity=5",
+              "expected": {
+                "return": "HTTP 201; body {\"orderId\":1,\"total\":250.0}"
+              },
+              "type": "Boundary",
+              "rule_refs": [
+                "BR-03"
+              ],
+              "note": "createOrder_QuantityEqualsStock_Returns201 | BVA: qty=stock",
+              "id": "UTC006"
+            },
+            {
+              "pre": "P002: price=50, stock=5",
+              "input": "body.productId=P002; body.quantity=6",
+              "expected": {
+                "return": "HTTP 409",
+                "exception": "OutOfStockException (OUT_OF_STOCK)",
+                "log": "\"Insufficient stock\""
+              },
+              "type": "Abnormal",
+              "rule_refs": [
+                "BR-03"
+              ],
+              "note": "createOrder_QuantityOverStock_Returns409 | BVA: qty=stock+1",
+              "id": "UTC007"
+            },
+            {
+              "pre": "P001: price=100, stock=500",
+              "input": "body.productId=P001; body.quantity=0",
+              "expected": {
+                "return": "HTTP 400",
+                "exception": "VALIDATION_ERROR",
+                "log": "\"quantity must be between 1 and 100\""
+              },
+              "type": "Abnormal",
+              "rule_refs": [
+                "BR-02"
+              ],
+              "note": "createOrder_Quantity0_Returns400 | BVA: qty=Min-1",
+              "id": "UTC008"
+            },
+            {
+              "pre": "P001: price=100, stock=500",
+              "input": "body.productId=P001; body.quantity=101",
+              "expected": {
+                "return": "HTTP 400",
+                "exception": "VALIDATION_ERROR",
+                "log": "\"quantity must be between 1 and 100\""
+              },
+              "type": "Abnormal",
+              "rule_refs": [
+                "BR-02"
+              ],
+              "note": "createOrder_Quantity101_Returns400 | BVA: qty=Max+1",
+              "id": "UTC009"
+            },
+            {
+              "pre": "N/A",
+              "input": "body.productId=P001; body.quantity=\"abc\"",
+              "expected": {
+                "return": "HTTP 400",
+                "exception": "VALIDATION_ERROR",
+                "log": "\"quantity must be an integer\""
+              },
+              "type": "Abnormal",
+              "rule_refs": [
+                "BR-02"
+              ],
+              "note": "createOrder_QuantityNotNumber_Returns400 | Error guessing: sai kiểu",
+              "id": "UTC010"
+            },
+            {
+              "pre": "N/A",
+              "input": "body.quantity=5 (thiếu productId)",
+              "expected": {
+                "return": "HTTP 400",
+                "exception": "VALIDATION_ERROR",
+                "log": "\"productId is required\""
+              },
+              "type": "Abnormal",
+              "rule_refs": [
+                "BR-01"
+              ],
+              "note": "createOrder_MissingProductId_Returns400 | Error guessing: thiếu field bắt buộc",
+              "id": "UTC011"
+            },
+            {
+              "pre": "P999 không tồn tại",
+              "input": "body.productId=P999; body.quantity=1",
+              "expected": {
+                "return": "HTTP 404",
+                "exception": "ProductNotFoundException (PRODUCT_NOT_FOUND)",
+                "log": "\"Product not found\""
+              },
+              "type": "Abnormal",
+              "rule_refs": [
+                "BR-01"
+              ],
+              "note": "createOrder_UnknownProduct_Returns404 | EP: productId invalid",
+              "id": "UTC012"
+            },
+            {
+              "pre": "N/A",
+              "input": "không có header Authorization; body.productId=P001; body.quantity=1",
+              "expected": {
+                "return": "HTTP 401",
+                "exception": "UNAUTHORIZED",
+                "log": "\"Missing or invalid token\""
+              },
+              "type": "Abnormal",
+              "rule_refs": [
+                "BR-05"
+              ],
+              "note": "createOrder_NoToken_Returns401 | EP: auth invalid",
+              "id": "UTC013"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "module_name": "Order API",
+      "sheet_name": "GET_api_orders_id",
+      "description": "Xem chi tiết một đơn hàng. Chỉ chủ đơn hàng mới được xem.",
+      "pre_condition": "DB test đã seed: P001 (price=100, stock=500), P002 (price=50, stock=5). User alice (id=1), bob (id=2).",
+      "methods": [
+        {
+          "name": "getOrderById",
+          "api": {
+            "http_method": "GET",
+            "path": "/api/orders/{id}",
+            "summary": "Xem chi tiết một đơn hàng. Chỉ chủ đơn hàng mới được xem.",
+            "source": "SRS_OSHOP_v1.0 mục 3.2.2",
+            "auth": "Bearer JWT (bắt buộc)",
+            "request": [
+              {
+                "name": "Authorization",
+                "in": "header",
+                "type": "string",
+                "required": true,
+                "constraints": "Bearer <JWT hợp lệ>"
+              },
+              {
+                "name": "id",
+                "in": "path",
+                "type": "integer",
+                "required": true,
+                "constraints": "Số nguyên dương"
+              }
+            ],
+            "responses": [
+              {
+                "status": 200,
+                "description": "Trả về chi tiết đơn hàng"
+              },
+              {
+                "status": 400,
+                "error_code": "VALIDATION_ERROR",
+                "description": "id không phải số nguyên dương"
+              },
+              {
+                "status": 401,
+                "error_code": "UNAUTHORIZED",
+                "description": "Thiếu hoặc sai token"
+              },
+              {
+                "status": 403,
+                "error_code": "FORBIDDEN",
+                "description": "Không phải chủ đơn hàng"
+              },
+              {
+                "status": 404,
+                "error_code": "ORDER_NOT_FOUND",
+                "description": "Không tồn tại đơn hàng"
+              }
+            ],
+            "rules": [
+              {
+                "id": "BR-06",
+                "text": "Đơn hàng tồn tại và thuộc về user hiện tại thì trả về 200",
+                "source": "SRS 3.2.2.a"
+              },
+              {
+                "id": "BR-07",
+                "text": "Đơn hàng không tồn tại trả về 404",
+                "source": "SRS 3.2.2.b"
+              },
+              {
+                "id": "BR-08",
+                "text": "User chỉ được xem đơn hàng của chính mình (403 nếu khác)",
+                "source": "SRS 3.2.2.c"
+              },
+              {
+                "id": "BR-09",
+                "text": "id phải là số nguyên dương",
+                "source": "SRS 3.2.2.d"
+              },
+              {
+                "id": "BR-05",
+                "text": "Yêu cầu token đăng nhập hợp lệ",
+                "source": "SRS 2.1 Security"
+              },
+              {
+                "id": "BR-10",
+                "text": "Đơn hàng đã huỷ vẫn xem được nhưng status=CANCELLED",
+                "source": "SRS 3.2.2.e"
+              }
+            ]
+          },
+          "test_cases": [
+            {
+              "pre": "Order 100 thuộc alice; login alice",
+              "input": "header.Authorization=Bearer <alice>; path.id=100",
+              "expected": {
+                "return": "HTTP 200; body {\"id\":100,\"userId\":1,...}"
+              },
+              "type": "Normal",
+              "rule_refs": [
+                "BR-06"
+              ],
+              "note": "getOrderById_OwnOrder_Returns200 | EP: valid",
+              "id": "UTC001"
+            },
+            {
+              "pre": "Order 999 không tồn tại; login alice",
+              "input": "path.id=999",
+              "expected": {
+                "return": "HTTP 404",
+                "exception": "OrderNotFoundException (ORDER_NOT_FOUND)",
+                "log": "\"Order not found\""
+              },
+              "type": "Abnormal",
+              "rule_refs": [
+                "BR-07"
+              ],
+              "note": "getOrderById_NotExist_Returns404 | EP: id valid-format nhưng không tồn tại",
+              "id": "UTC002"
+            },
+            {
+              "pre": "Order 100 thuộc alice; login bob",
+              "input": "header.Authorization=Bearer <bob>; path.id=100",
+              "expected": {
+                "return": "HTTP 403",
+                "exception": "FORBIDDEN",
+                "log": "\"Access denied\""
+              },
+              "type": "Abnormal",
+              "rule_refs": [
+                "BR-08"
+              ],
+              "note": "getOrderById_OtherUsersOrder_Returns403 | Decision table: tồn tại, khác chủ",
+              "id": "UTC003"
+            },
+            {
+              "pre": "N/A",
+              "input": "path.id=0",
+              "expected": {
+                "return": "HTTP 400",
+                "exception": "VALIDATION_ERROR",
+                "log": "\"id must be a positive integer\""
+              },
+              "type": "Boundary",
+              "rule_refs": [
+                "BR-09"
+              ],
+              "note": "getOrderById_IdZero_Returns400 | BVA: id=Min-1",
+              "id": "UTC004"
+            },
+            {
+              "pre": "N/A",
+              "input": "path.id=abc",
+              "expected": {
+                "return": "HTTP 400",
+                "exception": "VALIDATION_ERROR",
+                "log": "\"id must be a positive integer\""
+              },
+              "type": "Abnormal",
+              "rule_refs": [
+                "BR-09"
+              ],
+              "note": "getOrderById_IdNotNumber_Returns400 | Error guessing: sai kiểu",
+              "id": "UTC005"
+            },
+            {
+              "pre": "N/A",
+              "input": "không có header Authorization; path.id=100",
+              "expected": {
+                "return": "HTTP 401",
+                "exception": "UNAUTHORIZED",
+                "log": "\"Missing or invalid token\""
+              },
+              "type": "Abnormal",
+              "rule_refs": [
+                "BR-05"
+              ],
+              "note": "getOrderById_NoToken_Returns401 | EP: auth invalid",
+              "id": "UTC006"
+            },
+            {
+              "pre": "Order 101 thuộc alice, status=CANCELLED; login alice",
+              "input": "header.Authorization=Bearer <alice>; path.id=101",
+              "expected": {
+                "return": "HTTP 200; body {\"id\":101,\"status\":\"CANCELLED\"}"
+              },
+              "type": "Normal",
+              "rule_refs": [
+                "BR-10"
+              ],
+              "note": "getOrderById_CancelledOrder_Returns200WithStatus | Decision table: trạng thái đơn",
+              "id": "UTC007"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

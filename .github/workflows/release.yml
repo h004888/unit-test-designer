@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: build & release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cài build
+        run: python -m pip install --upgrade build
+
+      - name: Build
+        run: python -m build
+
+      - name: Kiểm wheel chứa dữ liệu
+        run: |
+          python - <<'PY'
+          import glob, sys, zipfile
+          wheel = glob.glob("dist/*.whl")
+          if not wheel:
+              sys.exit("Không có .whl")
+          names = zipfile.ZipFile(wheel[0]).namelist()
+          rules = [n for n in names if n.startswith("utd/_data/rules/")]
+          datas = [n for n in names if n.startswith("utd/_data/data/")]
+          if len(rules) != 10 or len(datas) != 3:
+              sys.exit(f"Wheel thiếu dữ liệu: rules={len(rules)} data={len(datas)}")
+          print(f"{wheel[0]}: {len(rules)} rules, {len(datas)} data")
+          PY
+
+      - name: Tạo GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            dist/*.whl \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes

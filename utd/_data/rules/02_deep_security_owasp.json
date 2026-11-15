@@ -1,0 +1,265 @@
+{
+  "domain": "02_deep_security_owasp.json",
+  "rules": [
+    {
+      "id": "H-SEC-AUTH-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Missing or Invalid Token",
+      "target_element": "protected_endpoint",
+      "trigger_condition": "endpoint.auth != 'public'",
+      "strictness": "MANDATORY",
+      "question_template": "Khi request không gửi Header Authorization hoặc gửi Token không hợp lệ / sai format, API trả về HTTP status và mã lỗi nào?",
+      "recommended_option": "(Recommended) Trả về HTTP 401 Unauthorized kèm header WWW-Authenticate và mã UNAUTHORIZED",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-AUTH-02",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Token Expiry & Revocation",
+      "target_element": "protected_endpoint",
+      "trigger_condition": "endpoint.auth != 'public'",
+      "strictness": "MANDATORY",
+      "question_template": "Khi Token đã hết hạn (expired) hoặc tài khoản đã bị thu hồi/khóa (revoked session), API phản hồi mã lỗi gì?",
+      "recommended_option": "(Recommended) Trả về HTTP 401 Unauthorized kèm mã lỗi TOKEN_EXPIRED hoặc USER_DISABLED",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-AUTH-03",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "JWT Alg None Bypass",
+      "target_element": "jwt_auth_endpoint",
+      "trigger_condition": "endpoint.auth.includes('jwt')",
+      "strictness": "MANDATORY",
+      "question_template": "API có bảo vệ chống lỗ hổng JWT thuật toán 'none' (alg: none) hoặc chữ ký rỗng không?",
+      "recommended_option": "(Recommended) Bắt buộc từ chối token 'alg: none' với lỗi 401 INVALID_TOKEN_ALGORITHM",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-AUTH-04",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "JWT Clock Skew Window",
+      "target_element": "jwt_auth_endpoint",
+      "trigger_condition": "endpoint.auth.includes('jwt')",
+      "strictness": "CONDITIONAL",
+      "question_template": "Hệ thống có cho phép độ lệch đồng hồ (Clock Skew tolerance, ví dụ: +/- 60 giây) cho trường 'exp' và 'nbf' của JWT token không?",
+      "recommended_option": "(Recommended) Cho phép độ lệch tối đa 60 giây để tránh lỗi ngẫu nhiên giữa các cụm máy chủ phân tán",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-BOLA-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Object-Level Auth (BOLA/IDOR)",
+      "target_element": "resource_id_endpoint",
+      "trigger_condition": "endpoint.path.includes('{id}')",
+      "strictness": "MANDATORY",
+      "question_template": "Khi User A đã đăng nhập nhưng truy cập hoặc thao tác vào tài nguyên '{resource_name}' thuộc quyền sở hữu của User B, API phản hồi thế nào?",
+      "recommended_option": "(Recommended) Trả về 403 FORBIDDEN kèm mã ACCESS_DENIED (hoặc 404 NOT_FOUND để che giấu sự tồn tại của ID)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-BFLA-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Function-Level Auth (BFLA)",
+      "target_element": "role_restricted_endpoint",
+      "trigger_condition": "endpoint.roles != null",
+      "strictness": "MANDATORY",
+      "question_template": "Khi User có vai trò thông thường (USER) gọi vào endpoint yêu cầu quyền quản trị (ADMIN/MANAGER), API trả về mã nào?",
+      "recommended_option": "(Recommended) Trả về 403 FORBIDDEN kèm mã lỗi INSUFFICIENT_PERMISSIONS",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-MASS-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Mass Assignment Privilege Escalation",
+      "target_element": "request_body",
+      "trigger_condition": "method in ['POST', 'PUT', 'PATCH']",
+      "strictness": "MANDATORY",
+      "question_template": "Nếu Client gửi thêm các trường đặc quyền không khai báo trong request (ví dụ: 'role': 'admin', 'isVerified': true), API xử lý sao?",
+      "recommended_option": "(Recommended) Từ chối với lỗi 400 UNRECOGNIZED_FIELD hoặc âm thầm bỏ qua (ignore) không ghi vào DB",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-SSRF-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Server-Side Request Forgery (SSRF)",
+      "target_element": "url_input_param",
+      "trigger_condition": "param.name.includes('url')",
+      "strictness": "MANDATORY",
+      "question_template": "Khi Client truyền URL nội bộ (127.0.0.1, localhost, 169.254.169.254 - AWS metadata) vào trường '{param_name}', API xử lý ra sao?",
+      "recommended_option": "(Recommended) Chặn tuyệt đối IP private/internal với lỗi 400 INVALID_URL_TARGET",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-CONF-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Stack Trace & Debug Leak",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi xảy ra sự cố nội bộ (Internal Server Error), API có đảm bảo tuyệt đối không để lộ Stack Trace, SQL query ra ngoài body không?",
+      "recommended_option": "(Recommended) Che giấu chi tiết kỹ thuật; chỉ trả về Error Code chung chung và Correlation ID (TraceId) để tra cứu log",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-INVENT-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Improper Inventory & Deprecated API",
+      "target_element": "all_endpoints",
+      "trigger_condition": "endpoint.path.includes('/v')",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi Client gọi vào phiên bản API cũ đã bị khai tử (deprecated version), hệ thống phản hồi mã lỗi gì?",
+      "recommended_option": "(Recommended) Trả về HTTP 410 GONE hoặc header Sunset kèm cảnh báo Deprecated",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-TENANT-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Multi-Tenant Data Isolation",
+      "target_element": "multi_tenant_endpoint",
+      "trigger_condition": "is_multi_tenant == true",
+      "strictness": "MANDATORY",
+      "question_template": "Trong kiến trúc Multi-Tenant, khi User của Tenant A truyền Tenant ID của Tenant B trong Header hoặc URL, hệ thống xử lý thế nào?",
+      "recommended_option": "(Recommended) Lấy Tenant ID từ Token claims của người dùng, bỏ qua tham số client gửi lên; chặn 403 nếu cố tình truy cập chéo",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-BRUTE-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Brute-force & Credential Stuffing",
+      "target_element": "auth_endpoint",
+      "trigger_condition": "endpoint.path.includes('login')",
+      "strictness": "MANDATORY",
+      "question_template": "API đăng nhập/xác thực có cơ chế khóa tạm thời (Account Lockout) hoặc CAPTCHA sau 5 lần nhập sai liên tiếp không?",
+      "recommended_option": "(Recommended) Khóa tài khoản tạm thời 15 phút sau 5 lần sai mật khẩu liên tiếp (423 LOCKED hoặc 429 TOO_MANY_REQUESTS)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-CORS-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Overly Permissive CORS",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Header CORS 'Access-Control-Allow-Origin' có dùng wildcard '*' khi API yêu cầu Cookie/Credentials không?",
+      "recommended_option": "(Recommended) Bắt buộc cấu hình Whitelist domain cụ thể, cấm dùng '*' khi bật Allow-Credentials",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-SCOPE-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "OAuth2 Token Scope Enforcement",
+      "target_element": "oauth_endpoint",
+      "trigger_condition": "endpoint.auth.includes('oauth')",
+      "strictness": "MANDATORY",
+      "question_template": "Khi Token hợp lệ nhưng thiếu Scope cụ thể (ví dụ: có scope 'read' nhưng gọi API 'write'), API phản hồi mã lỗi gì?",
+      "recommended_option": "(Recommended) Trả về HTTP 403 FORBIDDEN kèm mã INSUFFICIENT_SCOPE",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-KEY-ROT-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Signing Key Rotation (JWKS)",
+      "target_element": "jwt_auth_endpoint",
+      "trigger_condition": "endpoint.auth.includes('jwt')",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi hệ thống đổi khóa ký JWT (Key Rotation), các token ký bằng key cũ còn thời hạn có được chấp nhận trong thời gian chuyển tiếp không?",
+      "recommended_option": "(Recommended) Hệ thống hỗ trợ JWKS đa khóa (kid), chấp nhận key cũ hợp lệ cho đến khi hết hạn",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-FILE-MIME-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "MIME Type Spoofing",
+      "target_element": "file_upload_param",
+      "trigger_condition": "param.type == 'file'",
+      "strictness": "MANDATORY",
+      "question_template": "Hệ thống có kiểm tra Magic Bytes nội dung file upload không, hay chỉ tin tưởng Header Content-Type hoặc đuôi file do client gửi lên?",
+      "recommended_option": "(Recommended) Bắt buộc quét Magic Bytes (file signature) ở backend để chống giả mạo file thực thi (.exe/php đổi đuôi thành .png)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-METHOD-TAMPER-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "HTTP Method Tampering",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi đổi HTTP Method từ POST sang GET hoặc HEAD trên endpoint cần ghi dữ liệu, API phản hồi thế nào?",
+      "recommended_option": "(Recommended) Trả về HTTP 405 Method Not Allowed kèm header Allow: POST",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-PASS-POLICY-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Password Complexity Policy",
+      "target_element": "password_param",
+      "trigger_condition": "param.name.includes('pass')",
+      "strictness": "MANDATORY",
+      "question_template": "Quy định độ phức tạp mật khẩu: Độ dài tối thiểu (>= 8 ký tự), có cấm các mật khẩu phổ biến trong từ điển (Pwned Passwords) không?",
+      "recommended_option": "(Recommended) Tối thiểu 8 ký tự, có chữ và số; từ chối nếu nằm trong danh sách mật khẩu yếu phổ biến (400 WEAK_PASSWORD)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-SESS-REVOKE-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Password Change Session Revocation",
+      "target_element": "user_profile_endpoint",
+      "trigger_condition": "endpoint.path.includes('password')",
+      "strictness": "MANDATORY",
+      "question_template": "Khi người dùng đổi mật khẩu thành công, toàn bộ các phiên đăng nhập (Tokens/Sessions) trên các thiết bị khác có bị vô hiệu hóa lập tức không?",
+      "recommended_option": "(Recommended) Bắt buộc thu hồi (revoke) toàn bộ Refresh Tokens và Sessions cũ trên mọi thiết bị",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-SEC-AUDIT-LOG-01",
+      "dimension": "2. Deep Security & OWASP Top 10",
+      "category": "Security Sensitive Action Audit",
+      "target_element": "sensitive_endpoint",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Các hành động nhạy cảm (Đổi mật khẩu, Chuyển tiền, Phân quyền) có được ghi lại trong Audit Log (UserId, IP, Timestamp, Action) không?",
+      "recommended_option": "(Recommended) Bắt buộc ghi Audit Log bất biến không thể sửa/xóa phục vụ điều tra an ninh",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,161 @@
+{
+  "domain": "03_null_missing_schema.json",
+  "rules": [
+    {
+      "id": "H-NULL-OMIT-01",
+      "dimension": "3. Null, Missing & Schema Drift",
+      "category": "Omitted vs Null Field",
+      "target_element": "optional_param",
+      "trigger_condition": "param.required == false",
+      "strictness": "MANDATORY",
+      "question_template": "Với trường tùy chọn '{param_name}': Khi Client không truyền (omitted) vs truyền rõ ràng là null (\"field\": null), hệ thống xử lý khác nhau không?",
+      "recommended_option": "(Recommended) Omitted: giữ nguyên giá trị mặc định; Null: xóa trắng hoặc đặt về null (nếu trường cho phép nullable)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-NULL-BOOL-01",
+      "dimension": "3. Null, Missing & Schema Drift",
+      "category": "Boolean Omission Tri-State",
+      "target_element": "boolean_param",
+      "trigger_condition": "param.type == 'boolean'",
+      "strictness": "MANDATORY",
+      "question_template": "Với trường logic '{param_name}', khi Client không gửi lên thì mặc định là false hay cho phép trạng thái thứ 3 (tri-state: true, false, null)?",
+      "recommended_option": "(Recommended) Mặc định là false (không tri-state), đảm bảo dữ liệu nhị phân rõ ràng",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-NULL-NUM-01",
+      "dimension": "3. Null, Missing & Schema Drift",
+      "category": "Numeric Zero vs Omission",
+      "target_element": "numeric_counter_param",
+      "trigger_condition": "param.type in ['integer', 'number']",
+      "strictness": "MANDATORY",
+      "question_template": "Với trường số tùy chọn '{param_name}', khi không truyền thì mặc định là 0 hay giữ nguyên giá trị cũ trong DB?",
+      "recommended_option": "(Recommended) Mặc định là 0 nếu tạo mới; giữ nguyên giá trị cũ nếu là cập nhật (PATCH)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-NULL-ARR-01",
+      "dimension": "3. Null, Missing & Schema Drift",
+      "category": "Empty Array vs Omitted Array",
+      "target_element": "array_param",
+      "trigger_condition": "param.type == 'array'",
+      "strictness": "MANDATORY",
+      "question_template": "Với trường mảng: Không truyền mảng vs truyền mảng rỗng [] có ý nghĩa khác nhau trong lệnh cập nhật không?",
+      "recommended_option": "(Recommended) Không truyền: giữ nguyên danh sách hiện tại; Truyền []: xóa sạch toàn bộ danh sách cũ",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-NULL-REQ-MISS-01",
+      "dimension": "3. Null, Missing & Schema Drift",
+      "category": "Missing Required Field",
+      "target_element": "required_param",
+      "trigger_condition": "param.required == true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi Client gửi thiếu hoàn toàn trường bắt buộc '{param_name}', API trả về HTTP status và mã lỗi nào?",
+      "recommended_option": "(Recommended) Trả về HTTP 400 Bad Request kèm mã MISSING_REQUIRED_FIELD và tên trường bị thiếu",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-NULL-REQ-NULL-01",
+      "dimension": "3. Null, Missing & Schema Drift",
+      "category": "Null on Required Field",
+      "target_element": "required_param",
+      "trigger_condition": "param.required == true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi trường bắt buộc '{param_name}' được truyền nhưng giá trị là null, API phản hồi thế nào?",
+      "recommended_option": "(Recommended) Báo lỗi 400 Bad Request kèm mã FIELD_CANNOT_BE_NULL",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-NULL-EMPTY-OBJ-01",
+      "dimension": "3. Null, Missing & Schema Drift",
+      "category": "Empty Object Body",
+      "target_element": "request_body",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi Client gửi body rỗng {} hoặc rỗng hoàn toàn (0 bytes) lên API yêu cầu dữ liệu, API phản hồi thế nào?",
+      "recommended_option": "(Recommended) Trả về HTTP 400 Bad Request kèm mã EMPTY_REQUEST_BODY",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-NULL-SCHEMA-EXTRA-01",
+      "dimension": "3. Null, Missing & Schema Drift",
+      "category": "Strict vs Loose Schema Validation",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi Client gửi thêm các trường lạ không có trong Schema đặc tả (Unrecognized fields), API chặn hay bỏ qua?",
+      "recommended_option": "(Recommended) Bỏ qua (ignore) các trường thừa để tương thích ngược cho Mobile App cũ, trừ khi có cấu hình strict",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-NULL-ENUM-NULL-01",
+      "dimension": "3. Null, Missing & Schema Drift",
+      "category": "Null Value on Enum",
+      "target_element": "enum_param",
+      "trigger_condition": "param.enum != null",
+      "strictness": "MANDATORY",
+      "question_template": "Trường Enum '{param_name}' có chấp nhận giá trị null không nếu trường là tùy chọn?",
+      "recommended_option": "(Recommended) Cho phép null nếu tùy chọn, hoặc bắt buộc phải chọn 1 trong các giá trị enum",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-NULL-DEFAULT-OVERRIDE-01",
+      "dimension": "3. Null, Missing & Schema Drift",
+      "category": "Default Value Override",
+      "target_element": "optional_param",
+      "trigger_condition": "param.default != null",
+      "strictness": "MANDATORY",
+      "question_template": "Khi Client truyền giá trị khác giá trị mặc định, hệ thống ghi đè chuẩn xác 100% không?",
+      "recommended_option": "(Recommended) Ghi nhận chính xác giá trị client truyền, chỉ dùng giá trị mặc định khi client bỏ trống",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-NULL-BLANK-STRING-NULL-01",
+      "dimension": "3. Null, Missing & Schema Drift",
+      "category": "Blank String to Null Coercion",
+      "target_element": "string_param",
+      "trigger_condition": "param.type == 'string'",
+      "strictness": "CONDITIONAL",
+      "question_template": "Hệ thống có tự động convert chuỗi rỗng \"\" thành null trong cơ sở dữ liệu không?",
+      "recommended_option": "(Recommended) Phân định rõ ràng: lưu chuỗi rỗng nếu là string rỗng, không tự động biến thành null gây lỗi logic",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-NULL-BACKWARD-COMPAT-01",
+      "dimension": "3. Null, Missing & Schema Drift",
+      "category": "Response Backward Compatibility",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi API nâng cấp thêm trường mới trong Response, các Client cũ không có trường này có bị crash không?",
+      "recommended_option": "(Recommended) Đảm bảo tính tương thích ngược (Backward Compatibility): thêm trường mới tùy chọn, không đổi tên/xóa trường cũ",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    }
+  ]
+}

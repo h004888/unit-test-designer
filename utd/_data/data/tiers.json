@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "description": "Nhóm rule bắt buộc hỏi người dùng trực tiếp (CRITICAL) thay vì phê duyệt theo lô.",
+  "critical_if_strictness": ["MANDATORY"],
+  "critical_dimensions": [
+    "2. Deep Security & OWASP Top 10",
+    "3. Null, Missing & Schema Drift",
+    "5. Finite State Machine & Lifecycle",
+    "8. Domain-Specific Scenarios (Fintech/E-com)"
+  ],
+  "critical_category_keywords": [
+    "auth",
+    "token",
+    "bola",
+    "idor",
+    "bfla",
+    "missing",
+    "null",
+    "state",
+    "transition",
+    "bounds",
+    "length",
+    "numeric",
+    "negative",
+    "money",
+    "balance",
+    "payment",
+    "idempotency"
+  ],
+  "standard_dimensions": [
+    "9. Transport, Headers & Protocols",
+    "10. Error Contracts, I18n & Audit"
+  ]
+}

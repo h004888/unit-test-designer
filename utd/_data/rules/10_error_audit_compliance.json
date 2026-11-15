@@ -1,0 +1,109 @@
+{
+  "domain": "10_error_audit_compliance.json",
+  "rules": [
+    {
+      "id": "H-ERR-RFC7807-01",
+      "dimension": "10. Error Contracts, I18n & Audit",
+      "category": "Problem Details Schema RFC 7807",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Cấu trúc body trả về chuẩn khi gặp lỗi là gì (RFC 7807 Problem Details hay Custom JSON Envelope)?",
+      "recommended_option": "(Recommended) Chuẩn thống nhất gồm: { \"code\": \"STRING_CODE\", \"message\": \"Mô tả lỗi\", \"timestamp\": \"ISO_DATE\", \"errors\": [...] }",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-ERR-PRECEDENCE-01",
+      "dimension": "10. Error Contracts, I18n & Audit",
+      "category": "Validation Precedence Hierarchy",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi một request vi phạm nhiều lỗi cùng lúc (Sai Token + Thiếu trường Required + ID không tồn tại), backend ưu tiên chặn lỗi nào trước?",
+      "recommended_option": "(Recommended) Thứ tự ưu tiên chuẩn: 1) Auth (401/403) -> 2) Format/Required Params (400) -> 3) Existence (404) -> 4) Business State (409)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-ERR-FIELD-MAP-01",
+      "dimension": "10. Error Contracts, I18n & Audit",
+      "category": "Field-Level Error Mapping Array",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi nhiều trường trong body bị lỗi cùng lúc, response có trả về danh sách chi tiết từng trường (field, rejectedValue, message) không?",
+      "recommended_option": "(Recommended) Trả về mảng 'errors' chi tiết từng trường bị lỗi để Frontend hiển thị form validation trực quan",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-ERR-I18N-LANG-01",
+      "dimension": "10. Error Contracts, I18n & Audit",
+      "category": "Multi-Language Error Localization (I18n)",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Thông điệp lỗi trả về có hỗ trợ đa ngôn ngữ (Tiếng Việt / Tiếng Anh) dựa theo Header 'Accept-Language' không?",
+      "recommended_option": "(Recommended) Hỗ trợ đa ngôn ngữ theo Accept-Language (vi-VN, en-US); fallback về en-US nếu không truyền",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-ERR-SENSITIVE-MASK-01",
+      "dimension": "10. Error Contracts, I18n & Audit",
+      "category": "Sensitive Data Masking in Error Logs",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Trong thông điệp lỗi hoặc log hệ thống, các trường nhạy cảm (Password, Token, Số thẻ tín dụng CVV) có được che mờ (Masking: '****') không?",
+      "recommended_option": "(Recommended) Tuyệt đối mask toàn bộ mật khẩu, số thẻ ngân hàng trong log và error response",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-ERR-COMPLIANCE-GDPR-01",
+      "dimension": "10. Error Contracts, I18n & Audit",
+      "category": "GDPR Data Erasure Compliance",
+      "target_element": "user_profile_endpoint",
+      "trigger_condition": "endpoint.path.includes('user')",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi User yêu cầu xóa tài khoản (Quyền được lãng quên - GDPR): Dữ liệu cá nhân (PII) được xử lý ẩn danh (Anonymize) như thế nào trong log và DB?",
+      "recommended_option": "(Recommended) Xóa trắng hoặc băm ẩn danh (Anonymize) toàn bộ PII (Email, Tên, Số điện thoại)",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-ERR-CORRELATION-LOG-01",
+      "dimension": "10. Error Contracts, I18n & Audit",
+      "category": "Correlation ID in Error Payload",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "MANDATORY",
+      "question_template": "Khi gặp lỗi 500 hoặc lỗi hạ tầng, body lỗi có trả về mã 'traceId' / 'correlationId' để người dùng báo cho bộ phận Support tra cứu log không?",
+      "recommended_option": "(Recommended) Bắt buộc trả về traceId duy nhất trong response lỗi 5xx",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    },
+    {
+      "id": "H-ERR-MAINTENANCE-503-01",
+      "dimension": "10. Error Contracts, I18n & Audit",
+      "category": "Scheduled Maintenance Handling",
+      "target_element": "all_endpoints",
+      "trigger_condition": "true",
+      "strictness": "CONDITIONAL",
+      "question_template": "Khi hệ thống đang bảo trì theo kế hoạch, API phản hồi thế nào?",
+      "recommended_option": "(Recommended) Trả về HTTP 503 Service Unavailable kèm header Retry-After và thông báo bảo trì rõ ràng",
+      "alternative_options": [
+        "Tùy biến theo nghiệp vụ riêng của dự án"
+      ]
+    }
+  ]
+}

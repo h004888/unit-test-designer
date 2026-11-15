@@ -1,0 +1,744 @@
+{
+  "schema_version": 1,
+  "source": "v1:realistic_user_data",
+  "records": [
+    {
+      "id": 1,
+      "category": "clipboard",
+      "sub_type": "invisible_character",
+      "locale": "all",
+      "payload_value": "​",
+      "quirk_type": "zero_width",
+      "description": "Ký tự tàng hình Zero-Width Space làm lệch length validation và regex"
+    },
+    {
+      "id": 2,
+      "category": "clipboard",
+      "sub_type": "invisible_character",
+      "locale": "all",
+      "payload_value": "Đơn hàng​ số 1",
+      "quirk_type": "zero_width_in_string",
+      "description": "Chuỗi có chèn ký tự Zero-Width Space ở giữa từ"
+    },
+    {
+      "id": 3,
+      "category": "clipboard",
+      "sub_type": "invisible_character",
+      "locale": "all",
+      "payload_value": "Khách hàng VIP",
+      "quirk_type": "non_breaking_space",
+      "description": "Ký tự Non-Breaking Space (\\u00A0) sinh ra khi copy từ web HTML hoặc Word"
+    },
+    {
+      "id": 4,
+      "category": "clipboard",
+      "sub_type": "smart_quote",
+      "locale": "all",
+      "payload_value": "“Đơn hàng ưu tiên”",
+      "quirk_type": "word_curly_double_quotes",
+      "description": "Dấu ngoặc kép cong thông minh của Word/iOS (“ ”) thay vì dấu nháy ASCII (\" \")"
+    },
+    {
+      "id": 5,
+      "category": "clipboard",
+      "sub_type": "smart_quote",
+      "locale": "all",
+      "payload_value": "‘Sản phẩm đặc biệt’",
+      "quirk_type": "word_curly_single_quotes",
+      "description": "Dấu ngoặc đơn cong thông minh của Word/iOS (‘ ’) thay vì dấu nháy ASCII (' ')"
+    },
+    {
+      "id": 6,
+      "category": "clipboard",
+      "sub_type": "dash_symbol",
+      "locale": "all",
+      "payload_value": "Mã đơn — 2026",
+      "quirk_type": "em_dash_symbol",
+      "description": "Ký tự gạch ngang dài Em-dash (—) thay vì dấu trừ thường (-)"
+    },
+    {
+      "id": 7,
+      "category": "clipboard",
+      "sub_type": "dash_symbol",
+      "locale": "all",
+      "payload_value": "Giai đoạn – 1",
+      "quirk_type": "en_dash_symbol",
+      "description": "Ký tự gạch ngang En-dash (–) từ văn bản in ấn"
+    },
+    {
+      "id": 8,
+      "category": "clipboard",
+      "sub_type": "newline_artifact",
+      "locale": "all",
+      "payload_value": "Dòng 1\r\nDòng 2",
+      "quirk_type": "crlf_windows_newline",
+      "description": "Ký tự xuống dòng định dạng Windows CRLF khi copy từ bảng tính Excel"
+    },
+    {
+      "id": 9,
+      "category": "clipboard",
+      "sub_type": "newline_artifact",
+      "locale": "all",
+      "payload_value": "Dòng 1\nDòng 2",
+      "quirk_type": "lf_unix_newline",
+      "description": "Ký tự xuống dòng định dạng Unix LF"
+    },
+    {
+      "id": 10,
+      "category": "clipboard",
+      "sub_type": "whitespace",
+      "locale": "all",
+      "payload_value": "\tDữ liệu có Tab",
+      "quirk_type": "tab_indentation_prefix",
+      "description": "Dính ký tự phím Tab (\\t) ở đầu do copy từ ô Excel"
+    },
+    {
+      "id": 11,
+      "category": "clipboard",
+      "sub_type": "invisible_character",
+      "locale": "all",
+      "payload_value": "﻿Dữ liệu có BOM",
+      "quirk_type": "byte_order_mark",
+      "description": "Ký tự Byte Order Mark (BOM \\uFEFF) xuất hiện khi đọc file UTF-8 từ Windows Notepad"
+    },
+    {
+      "id": 12,
+      "category": "clipboard",
+      "sub_type": "invisible_character",
+      "locale": "all",
+      "payload_value": "Chữ­nối",
+      "quirk_type": "soft_hyphen",
+      "description": "Ký tự gạch nối mềm Soft Hyphen (\\u00AD) ẩn trong văn bản web"
+    },
+    {
+      "id": 13,
+      "category": "clipboard",
+      "sub_type": "money_format",
+      "locale": "vi",
+      "payload_value": "500k",
+      "quirk_type": "slang_k_thousand",
+      "description": "Cách ghi tiền tệ thông tục chữ 'k' thay cho nghìn"
+    },
+    {
+      "id": 14,
+      "category": "clipboard",
+      "sub_type": "money_format",
+      "locale": "vi",
+      "payload_value": "1.5tr",
+      "quirk_type": "slang_tr_million",
+      "description": "Cách ghi tiền tệ thông tục 'tr' thay cho triệu"
+    },
+    {
+      "id": 15,
+      "category": "clipboard",
+      "sub_type": "money_format",
+      "locale": "vi",
+      "payload_value": "500.000đ",
+      "quirk_type": "currency_symbol_d_suffix",
+      "description": "Dính ký tự đơn vị đồng 'đ' viết liền sau số tiền"
+    },
+    {
+      "id": 16,
+      "category": "clipboard",
+      "sub_type": "money_format",
+      "locale": "vi",
+      "payload_value": "500,000.50",
+      "quirk_type": "us_number_format",
+      "description": "Định dạng số chuẩn Mỹ (phẩy hàng nghìn, chấm thập phân)"
+    },
+    {
+      "id": 17,
+      "category": "clipboard",
+      "sub_type": "money_format",
+      "locale": "vi",
+      "payload_value": "500.000,50",
+      "quirk_type": "eu_vn_number_format",
+      "description": "Định dạng số chuẩn Việt/Âu (chấm hàng nghìn, phẩy thập phân)"
+    },
+    {
+      "id": 18,
+      "category": "clipboard",
+      "sub_type": "html_entity",
+      "locale": "all",
+      "payload_value": "&amp; &lt; &gt; &quot;",
+      "quirk_type": "escaped_html_entities",
+      "description": "Người dùng copy text từ website bị dính mã HTML entities chưa giải mã"
+    },
+    {
+      "id": 19,
+      "category": "clipboard",
+      "sub_type": "url_encoded",
+      "locale": "all",
+      "payload_value": "Nguy%E1%BB%85n%20V%C4%83n%20A",
+      "quirk_type": "percent_encoded_text",
+      "description": "Text bị dính URL percent encoding do copy từ URL trình duyệt"
+    },
+    {
+      "id": 20,
+      "category": "clipboard",
+      "sub_type": "mixed_spaces",
+      "locale": "all",
+      "payload_value": "Từ 1   từ 2     từ 3",
+      "quirk_type": "multiple_consecutive_spaces",
+      "description": "Nhiều khoảng trắng liên tiếp không đồng đều giữa các từ"
+    },
+    {
+      "id": 21,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "Christopher Null",
+      "quirk_type": "null_keyword_collision",
+      "description": "Họ là 'Null' làm crash backend hoặc bị SQL parse thành database NULL"
+    },
+    {
+      "id": 22,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "O'Connor",
+      "quirk_type": "single_quote_apostrophe",
+      "description": "Họ Ai-len chứa dấu nháy đơn, dễ gây SQL Injection hoặc JSON parse error"
+    },
+    {
+      "id": 23,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "D'Souza",
+      "quirk_type": "single_quote_apostrophe",
+      "description": "Họ Bồ Đào Nha / Ấn Độ có dấu nháy đơn lửng"
+    },
+    {
+      "id": 24,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "Jean-Luc Picard",
+      "quirk_type": "hyphenated_first_name",
+      "description": "Tên gọi có dấu gạch nối kiểu Pháp"
+    },
+    {
+      "id": 25,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "Jennifer 8. Lee",
+      "quirk_type": "numeric_middle_name",
+      "description": "Tên có chứa chữ số '8.' hợp pháp trên giấy khai sinh"
+    },
+    {
+      "id": 26,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "Pablo Diego José Francisco de Paula Juan Nepomuceno María de los Remedios Cipriano de la Santísima Trinidad Ruiz y Picasso",
+      "quirk_type": "extreme_length_23_words",
+      "description": "Tên đầy đủ của danh họa Picasso gồm 23 từ, phá vỡ giới hạn độ dài ký tự"
+    },
+    {
+      "id": 27,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "Cher",
+      "quirk_type": "mononym",
+      "description": "Nghệ sĩ chỉ có 1 tên duy nhất hợp pháp"
+    },
+    {
+      "id": 28,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "李明",
+      "quirk_type": "cjk_kanji_hanzi",
+      "description": "Tên chữ Hán 2 ký tự (Li Ming) ngắn dưới 3 byte/char nếu validate độ dài sai"
+    },
+    {
+      "id": 29,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "محمد بن سلمان",
+      "quirk_type": "arabic_right_to_left",
+      "description": "Tên tiếng Ả Rập viết từ phải sang trái (RTL)"
+    },
+    {
+      "id": 30,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "김철수",
+      "quirk_type": "hangul_korean",
+      "description": "Tên tiếng Hàn Hangul chuẩn"
+    },
+    {
+      "id": 31,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "Владимир Иванов",
+      "quirk_type": "cyrillic_russian",
+      "description": "Tên tiếng Nga ký tự Cyrillic"
+    },
+    {
+      "id": 32,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "John Doe Jr. III",
+      "quirk_type": "generational_suffix",
+      "description": "Tên chứa hậu tố thế hệ Jr. và số La Mã III"
+    },
+    {
+      "id": 33,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "García Márquez",
+      "quirk_type": "spanish_double_surname",
+      "description": "Họ kép Tây Ban Nha có dấu sắc Latin"
+    },
+    {
+      "id": 34,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "Al-Mansoor",
+      "quirk_type": "arabic_prefix_hyphen",
+      "description": "Tiền tố họ Ả Rập Al- có gạch nối"
+    },
+    {
+      "id": 35,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "Müller",
+      "quirk_type": "german_umlaut",
+      "description": "Tên tiếng Đức chứa ký tự umlaut ü"
+    },
+    {
+      "id": 36,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "Øyvind",
+      "quirk_type": "nordic_slashed_o",
+      "description": "Tên vùng Bắc Âu chứa ký tự gạch chéo Ø"
+    },
+    {
+      "id": 37,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "Kjeld Nuis",
+      "quirk_type": "dutch_name",
+      "description": "Tên tiếng Hà Lan"
+    },
+    {
+      "id": 38,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "Adam True",
+      "quirk_type": "boolean_true_collision",
+      "description": "Họ là 'True' dễ bị ép kiểu Boolean true"
+    },
+    {
+      "id": 39,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "David False",
+      "quirk_type": "boolean_false_collision",
+      "description": "Họ là 'False' dễ bị ép kiểu Boolean false"
+    },
+    {
+      "id": 40,
+      "category": "name",
+      "sub_type": "edge_case",
+      "locale": "intl",
+      "payload_value": "Robert ); DROP TABLE Students;--",
+      "quirk_type": "bobby_tables_sqli",
+      "description": "Tên kinh điển Bobby Tables thử nghiệm phòng thủ SQL Injection"
+    },
+    {
+      "id": 41,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "Số 12/34/56A ngách 82 ngõ 192 đường Lê Trọng Tấn, P. Định Công, Q. Hoàng Mai, TP. Hà Nội",
+      "quirk_type": "complex_nested_alley",
+      "description": "Địa chỉ ngõ ngách nhiều xuyệt số nhà chữ cái lồng nhau đặc thù đô thị Việt Nam"
+    },
+    {
+      "id": 42,
+      "category": "address",
+      "sub_type": "apartment",
+      "locale": "vi",
+      "payload_value": "Căn hộ 1208, Tòa S2.05 VinHomes Grand Park, Đường Nguyễn Xiển, P. Long Thạnh Mỹ, TP. Thủ Đức, TP. Hồ Chí Minh",
+      "quirk_type": "apartment_building_complex",
+      "description": "Địa chỉ khu đô thị / căn hộ chung cư phân cấp phòng và tòa nhà"
+    },
+    {
+      "id": 43,
+      "category": "address",
+      "sub_type": "rural",
+      "locale": "vi",
+      "payload_value": "Thôn 3, Xã Ea Ktur, Huyện Cư Kuin, Tỉnh Đắk Lắk",
+      "quirk_type": "rural_no_house_number",
+      "description": "Địa chỉ nông thôn không có số nhà và không có tên đường, không có mã ZIP"
+    },
+    {
+      "id": 44,
+      "category": "address",
+      "sub_type": "business",
+      "locale": "vi",
+      "payload_value": "Tầng 5, Tòa nhà FPT Cầu Giấy\r\nSố 10 Phạm Văn Bạch, P. Dịch Vọng Hậu, Q. Cầu Giấy, Hà Nội",
+      "quirk_type": "multiline_newline_characters",
+      "description": "Địa chỉ doanh nghiệp copy từ chữ ký email chứa ký tự xuống dòng \\r\\n"
+    },
+    {
+      "id": 45,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "123 Đường 30 Tháng 4, Phường 1, TP. Cao Lãnh, Tỉnh Đồng Tháp",
+      "quirk_type": "date_named_street",
+      "description": "Tên đường là ngày lễ lịch sử có số dễ làm nhầm lẫn parser"
+    },
+    {
+      "id": 46,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "Km 18, Quốc lộ 1A, Xã Nghi Long, Huyện Nghi Lộc, Tỉnh Nghệ An",
+      "quirk_type": "kilometer_milestone_address",
+      "description": "Địa chỉ mốc số kilomet quốc lộ"
+    },
+    {
+      "id": 47,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "Số 05 Đường 1, KDC Him Lam, Phường Tân Hưng, Quận 7, TP. Hồ Chí Minh",
+      "quirk_type": "numbered_street",
+      "description": "Tên đường là số (Đường 1, Đường 2) trong khu dân cư"
+    },
+    {
+      "id": 48,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "104½ Trần Hưng Đạo, P. Cầu Ông Lãnh, Quận 1, TP. Hồ Chí Minh",
+      "quirk_type": "fractional_house_number",
+      "description": "Số nhà có phân số 1/2 (½) ký tự đặc biệt"
+    },
+    {
+      "id": 49,
+      "category": "address",
+      "sub_type": "island",
+      "locale": "vi",
+      "payload_value": "Tổ hợp tác 1, Thôn Đông, Xã An Hải, Huyện Đảo Lý Sơn, Tỉnh Quảng Ngãi",
+      "quirk_type": "island_district",
+      "description": "Địa chỉ hải đảo xa xôi"
+    },
+    {
+      "id": 50,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "Lô B2-12 Khu Đô Thị Nam Cầu Tuyên Sơn, P. Khuê Mỹ, Q. Ngũ Hành Sơn, TP. Đà Nẵng",
+      "quirk_type": "lot_block_address",
+      "description": "Địa chỉ phân lô đất quy hoạch (Lô/Block)"
+    },
+    {
+      "id": 51,
+      "category": "address",
+      "sub_type": "industrial_zone",
+      "locale": "vi",
+      "payload_value": "Khu công nghiệp VSIP 1, Đại lộ Hữu Nghị, Phường Bình Hòa, TP. Thuận An, Tỉnh Bình Dương",
+      "quirk_type": "industrial_park",
+      "description": "Địa chỉ khu công nghiệp chế xuất"
+    },
+    {
+      "id": 52,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "24B/10 Nguyễn Thị Minh Khai, Đa Kao, Quận 1, Hồ Chí Minh",
+      "quirk_type": "missing_administrative_prefixes",
+      "description": "Người dùng lược bỏ tiền tố 'P.' và 'Q.', chỉ ghi tên riêng"
+    },
+    {
+      "id": 53,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "Hẻm 456 Quang Trung, P. 10, Q. Gò Vấp, TP. HCM",
+      "quirk_type": "southern_hem_slang",
+      "description": "Dùng từ địa phương miền Nam 'Hẻm' thay cho 'Ngõ/Ngách'"
+    },
+    {
+      "id": 54,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "Kiệt 124 Nguyễn Huệ, P. Phú Nhuận, TP. Huế, Tỉnh Thừa Thiên Huế",
+      "quirk_type": "central_kiet_slang",
+      "description": "Dùng từ địa phương miền Trung 'Kiệt' thay cho 'Ngõ'"
+    },
+    {
+      "id": 55,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "Ấp Bình Tiền 2, Xã Đức Hòa Hạ, Huyện Đức Hòa, Tỉnh Long An",
+      "quirk_type": "southern_ap_unit",
+      "description": "Đơn vị hành chính cấp cơ sở miền Tây 'Ấp'"
+    },
+    {
+      "id": 56,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "Bản Lướt, Xã Mường Kim, Huyện Than Uyên, Tỉnh Lai Châu",
+      "quirk_type": "mountain_ban_unit",
+      "description": "Đơn vị hành chính vùng cao 'Bản'"
+    },
+    {
+      "id": 57,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "Phòng 402 Khách sạn Mường Thanh, Bãi Cháy, TP. Hạ Long, Quảng Ninh",
+      "quirk_type": "hotel_guest_address",
+      "description": "Giao hàng đến phòng khách sạn lưu trú"
+    },
+    {
+      "id": 58,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "Số 01 Đại Cồ Việt, Bách Khoa, Hai Bà Trưng, Hà Nội",
+      "quirk_type": "university_campus_address",
+      "description": "Địa chỉ trường đại học lớn"
+    },
+    {
+      "id": 59,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "Kios số 15 Chợ Bến Thành, Đường Lê Lợi, Phường Bến Thành, Quận 1, TP. HCM",
+      "quirk_type": "market_kiosk_address",
+      "description": "Địa chỉ sạp/kios trong chợ truyền thống"
+    },
+    {
+      "id": 60,
+      "category": "address",
+      "sub_type": "street_address",
+      "locale": "vi",
+      "payload_value": "  Số 88 Phố Huế, Hàng Bài, Hoàn Kiếm, Hà Nội  ",
+      "quirk_type": "leading_trailing_spaces",
+      "description": "Địa chỉ copy paste dính khoảng trắng thừa hai bên"
+    },
+    {
+      "id": 61,
+      "category": "name",
+      "sub_type": "full_name",
+      "locale": "vi",
+      "payload_value": "Nguyễn Thị Ánh Viên",
+      "quirk_type": "standard_diacritics",
+      "description": "Họ tên tiếng Việt chuẩn có dấu, âm sắc phức tạp"
+    },
+    {
+      "id": 62,
+      "category": "name",
+      "sub_type": "full_name",
+      "locale": "vi",
+      "payload_value": "Công Tằng Tôn Nữ Khánh Huyền",
+      "quirk_type": "long_compound_surname",
+      "description": "Họ kép hoàng tộc Huế dài 6 từ, thường bị cắt cụt nếu DB để varchar(20)"
+    },
+    {
+      "id": 63,
+      "category": "name",
+      "sub_type": "full_name",
+      "locale": "vi",
+      "payload_value": "Trần-Lê Bảo Anh",
+      "quirk_type": "hyphenated_name",
+      "description": "Tên có dấu gạch nối kết hợp họ bố và họ mẹ"
+    },
+    {
+      "id": 64,
+      "category": "name",
+      "sub_type": "full_name",
+      "locale": "vi",
+      "payload_value": "Vũ",
+      "quirk_type": "mononym_single_word",
+      "description": "Tên chỉ có đúng 1 từ, không phân tách First/Last Name"
+    },
+    {
+      "id": 65,
+      "category": "name",
+      "sub_type": "full_name",
+      "locale": "vi",
+      "payload_value": "Nguyễn Văn An",
+      "quirk_type": "unicode_nfd_decomposition",
+      "description": "Chữ 'ễ' được mã hóa dạng tổ hợp NFD (e + ^ + ~) thay vì NFC dựng sẵn"
+    },
+    {
+      "id": 66,
+      "category": "name",
+      "sub_type": "full_name",
+      "locale": "vi",
+      "payload_value": "Đỗ Hoàng Gia Hưng",
+      "quirk_type": "diacritics_capital_d_stroke",
+      "description": "Chứa ký tự Đ/đ hoa và dấu hỏi ngã"
+    },
+    {
+      "id": 67,
+      "category": "name",
+      "sub_type": "full_name",
+      "locale": "vi",
+      "payload_value": "H'Hen Niê",
+      "quirk_type": "ethnic_minority_apostrophe",
+      "description": "Tên đồng bào dân tộc Ê-đê có dấu nháy đơn lửng"
+    },
+    {
+      "id": 68,
+      "category": "name",
+      "sub_type": "full_name",
+      "locale": "vi",
+      "payload_value": "Lê Văn Tèo",
+      "quirk_type": "short_common_name",
+      "description": "Tên ngắn 3 âm tiết thông dụng"
+    },
+    {
+      "id": 69,
+      "category": "name",
+      "sub_type": "full_name",
+      "locale": "vi",
+      "payload_value": "nGUYỄN vĂN tÙNG",
+      "quirk_type": "caps_lock_inversion",
+      "description": "Người dùng vô tình bật CapsLock khi gõ bộ gõ tiếng Việt"
+    },
+    {
+      "id": 70,
+      "category": "phone",
+      "sub_type": "mobile",
+      "locale": "vi",
+      "payload_value": "0901234567",
+      "quirk_type": "standard_mobile",
+      "description": "Đầu số di động 10 số Viettel/MobiFone/VinaPhone tiêu chuẩn"
+    },
+    {
+      "id": 71,
+      "category": "phone",
+      "sub_type": "mobile",
+      "locale": "vi",
+      "payload_value": "+84 90 123 4567",
+      "quirk_type": "international_with_spaces",
+      "description": "Mã quốc gia +84 có dấu cách ngăn cách"
+    },
+    {
+      "id": 72,
+      "category": "phone",
+      "sub_type": "mobile",
+      "locale": "vi",
+      "payload_value": "090.123.4567",
+      "quirk_type": "dot_separated",
+      "description": "Định dạng số điện thoại ngăn cách bằng dấu chấm"
+    },
+    {
+      "id": 73,
+      "category": "phone",
+      "sub_type": "mobile",
+      "locale": "vi",
+      "payload_value": "O901234567",
+      "quirk_type": "fat_finger_letter_o",
+      "description": "Người dùng gõ nhầm chữ cái 'O' hoa thay vì số 0"
+    },
+    {
+      "id": 74,
+      "category": "phone",
+      "sub_type": "landline",
+      "locale": "vi",
+      "payload_value": "(024) 3789.0123",
+      "quirk_type": "landline_parentheses",
+      "description": "Số điện thoại cố định Hà Nội có dấu ngoặc đơn mã vùng"
+    },
+    {
+      "id": 75,
+      "category": "phone",
+      "sub_type": "mobile",
+      "locale": "vi",
+      "payload_value": "84912345678",
+      "quirk_type": "country_code_no_plus",
+      "description": "Mã quốc gia 84 nhưng thiếu dấu cộng ở đầu"
+    },
+    {
+      "id": 76,
+      "category": "email",
+      "sub_type": "personal",
+      "locale": "vi",
+      "payload_value": "nguyenvana@gmail.com",
+      "quirk_type": "standard_email",
+      "description": "Email cá nhân Gmail chuẩn"
+    },
+    {
+      "id": 77,
+      "category": "email",
+      "sub_type": "personal",
+      "locale": "vi",
+      "payload_value": "  nguyenvana@gmail.com  ",
+      "quirk_type": "leading_trailing_spaces",
+      "description": "Copy-paste dính khoảng trắng đầu và cuối chuỗi"
+    },
+    {
+      "id": 78,
+      "category": "email",
+      "sub_type": "personal",
+      "locale": "vi",
+      "payload_value": "nguyen.van.a+shopping@fpt.edu.vn",
+      "quirk_type": "sub_addressing_tag",
+      "description": "Email có dấu cộng sub-addressing theo chuẩn RFC 5322"
+    },
+    {
+      "id": 79,
+      "category": "email",
+      "sub_type": "personal",
+      "locale": "vi",
+      "payload_value": "user@gmial.com",
+      "quirk_type": "fat_finger_domain_typo",
+      "description": "Gõ trượt phím miền email phổ biến (gmial thay vì gmail)"
+    },
+    {
+      "id": 80,
+      "category": "email",
+      "sub_type": "personal",
+      "locale": "vi",
+      "payload_value": "Nguyenvana@Outlook.com.vn",
+      "quirk_type": "mixed_case_domain",
+      "description": "Chữ hoa chữ thường lẫn lộn do điện thoại tự viết hoa chữ cái đầu"
+    },
+    {
+      "id": 81,
+      "category": "citizen_id",
+      "sub_type": "cccd",
+      "locale": "vi",
+      "payload_value": "001095012345",
+      "quirk_type": "standard_cccd",
+      "description": "Số CCCD gắn chip 12 chữ số hợp lệ bắt đầu bằng mã tỉnh 001"
+    },
+    {
+      "id": 82,
+      "category": "citizen_id",
+      "sub_type": "cccd",
+      "locale": "vi",
+      "payload_value": "001 095 012 345",
+      "quirk_type": "spaced_cccd",
+      "description": "Người dùng gõ CCCD có dấu cách theo cụm 3 số"
+    }
+  ]
+}
